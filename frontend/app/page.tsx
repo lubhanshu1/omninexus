@@ -58,7 +58,7 @@ const modules = [
     metric: "840K+",
     metricLabel: "Graph nodes",
   },
-];
+] as const;
 
 const systemSignals = [
   {
