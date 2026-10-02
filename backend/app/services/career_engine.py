@@ -1,35 +1,128 @@
-from app.services.skill_graph import build_skill_graph, find_shortest_career_path, get_skill_gaps
+from __future__ import annotations
+
+from app.services.skill_graph import (
+    SKILL_GRAPH_NODES,
+    build_skill_graph,
+    find_paths_to_role,
+)
 
 
-class CareerAnalysisResult(dict):
-    pass
+def analyze_career_path(
+    current_skills: list[str],
+    target_role: str,
+) -> dict:
+    """
+    Calculate a deterministic career-transition path.
 
+    The engine:
+    - normalizes incoming skill names
+    - handles an already-reached target role
+    - evaluates paths from all known current skills
+    - prefers the path with the fewest missing capabilities
+    - returns readiness, gaps, bottleneck and market value
+    """
 
-def analyze_career_path(current_skills: list[str], target_role: str) -> dict:
     graph = build_skill_graph()
-    shortest_path = find_shortest_career_path(current_skills, target_role, graph)
-    if not shortest_path:
+
+    target_role = target_role.strip()
+    if target_role not in graph:
         return {
             "status": "error",
-            "message": f"No skill path found for target role '{target_role}'",
+            "message": f"Unknown target role '{target_role}'.",
         }
 
-    acquired = [skill for skill in shortest_path if skill in current_skills]
-    missing_skills = [skill for skill in shortest_path if skill not in current_skills and skill != target_role]
-    bottleneck_skill = shortest_path[1] if len(shortest_path) > 1 else "None"
-    readiness_score = int((len(acquired) / len(shortest_path)) * 100) if shortest_path else 0
+    known_by_lower = {
+        name.lower(): name
+        for name in SKILL_GRAPH_NODES
+    }
+
+    normalized_skills: list[str] = []
+    seen: set[str] = set()
+
+    for raw_skill in current_skills:
+        canonical = known_by_lower.get(raw_skill.strip().lower())
+        if canonical and canonical not in seen:
+            normalized_skills.append(canonical)
+            seen.add(canonical)
+
+    if target_role in normalized_skills:
+        return {
+            "status": "success",
+            "shortest_path": [target_role],
+            "current_skills": normalized_skills,
+            "missing_skills": [],
+            "bottleneck_skill": "None",
+            "readiness_score": 100,
+            "market_value": 60000 + sum(
+                SKILL_GRAPH_NODES.get(skill, {}).get("val", 0)
+                for skill in normalized_skills
+            ),
+        }
+
+    candidate_paths: list[list[str]] = []
+
+    for skill in normalized_skills:
+        if skill == target_role or skill not in graph:
+            continue
+        candidate_paths.extend(
+            find_paths_to_role(skill, target_role, graph)
+        )
+
+    if not candidate_paths:
+        return {
+            "status": "error",
+            "message": (
+                f"No skill path found from the current capabilities "
+                f"to '{target_role}'."
+            ),
+        }
+
+    current_set = set(normalized_skills)
+
+    def path_score(path: list[str]) -> tuple[int, int]:
+        missing = sum(
+            1
+            for node in path
+            if node != target_role and node not in current_set
+        )
+        return missing, len(path)
+
+    best_path = min(candidate_paths, key=path_score)
+
+    required_skills = [
+        node for node in best_path
+        if node != target_role
+    ]
+
+    missing_skills = [
+        node for node in required_skills
+        if node not in current_set
+    ]
+
+    acquired_count = len(required_skills) - len(missing_skills)
+    readiness_score = (
+        round((acquired_count / len(required_skills)) * 100)
+        if required_skills
+        else 100
+    )
+
+    bottleneck_skill = (
+        missing_skills[0]
+        if missing_skills
+        else "None"
+    )
+
+    market_value = 60000 + sum(
+        SKILL_GRAPH_NODES.get(skill, {}).get("val", 0)
+        for skill in normalized_skills
+    )
 
     return {
         "status": "success",
-        "shortest_path": shortest_path,
-        "current_skills": current_skills,
+        "shortest_path": best_path,
+        "current_skills": normalized_skills,
         "missing_skills": missing_skills,
         "bottleneck_skill": bottleneck_skill,
-        "readiness_score": readiness_score,
-        "market_value": 60000 + sum(
-            SKILL_GRAPH_NODES.get(skill, {}).get("val", 0) for skill in current_skills if skill in SKILL_GRAPH_NODES
-        ),
+        "readiness_score": min(100, max(0, readiness_score)),
+        "market_value": market_value,
     }
-
-
-from app.services.skill_graph import SKILL_GRAPH_NODES
