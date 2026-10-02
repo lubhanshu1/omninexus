@@ -36,6 +36,8 @@ const API_BASE_URL =
     ? "https://omninexus-api-prod.onrender.com"
     : "http://localhost:8001");
 
+const IS_PRODUCTION_API = API_BASE_URL.includes("onrender.com");
+
 const HEALTH_ENDPOINT = `${API_BASE_URL}/api/v1/health`;
 
 const LOGIN_ENDPOINT = `${API_BASE_URL}/api/v1/auth/login`;
@@ -1394,7 +1396,9 @@ export default function Login() {
                     </p>
 
                     <p className="mt-0.5 text-[10px] text-slate-500">
-                      FastAPI · localhost:8001
+                      {IS_PRODUCTION_API
+                        ? "FastAPI · Render Production API"
+                        : "FastAPI · localhost:8001"}
                     </p>
                   </div>
                 </div>
@@ -1826,7 +1830,7 @@ export default function Login() {
                       <span className="text-[10px] text-slate-600">
                         Authentication is
                         unavailable while the
-                        Neural Engine is offline.
+                        OmniNexus API is offline.
                       </span>
                     </div>
                   )}
