@@ -263,7 +263,7 @@ export default function Login() {
     useState<HealthState>("checking");
 
   const [healthMessage, setHealthMessage] =
-    useState("Connecting to Neural Engine...");
+    useState("Connecting to OmniNexus API...");
 
   const [healthService, setHealthService] =
     useState("FastAPI Intelligence Layer");
@@ -281,7 +281,7 @@ export default function Login() {
       setHealthState("checking");
 
       setHealthMessage(
-        "Connecting to Neural Engine..."
+        "Connecting to OmniNexus API..."
       );
 
       try {
@@ -338,7 +338,7 @@ export default function Login() {
           setHealthState("online");
 
           setHealthMessage(
-            "Neural Engine Connected"
+            "OmniNexus API connected"
           );
         } else {
           setHealthState("online");
@@ -360,16 +360,16 @@ export default function Login() {
           err.name === "AbortError"
         ) {
           setHealthMessage(
-            "Neural Engine Timeout"
+            "API connection timed out"
           );
         } else if (err instanceof Error) {
           setHealthMessage(
             err.message ||
-            "Neural Engine Offline"
+            "OmniNexus API is offline"
           );
         } else {
           setHealthMessage(
-            "Neural Engine Offline"
+            "OmniNexus API is offline"
           );
         }
       }
@@ -439,7 +439,7 @@ export default function Login() {
 
     if (!normalizedEmail) {
       setError(
-        "Identity email is required."
+        "Email is required."
       );
 
       return false;
@@ -455,7 +455,7 @@ export default function Login() {
 
     if (!password) {
       setError(
-        "Security key is required."
+        "Password is required."
       );
 
       return false;
@@ -463,7 +463,7 @@ export default function Login() {
 
     if (password.length < 6) {
       setError(
-        "Security key must contain at least 6 characters."
+        "Password must contain at least 6 characters."
       );
 
       return false;
@@ -598,7 +598,7 @@ export default function Login() {
         );
 
         setSuccess(
-          "Authentication successful. Initializing OmniNexus..."
+          "Signed in. Opening your workspace..."
         );
 
         /*
@@ -644,7 +644,7 @@ export default function Login() {
         );
 
         setSuccess(
-          "Talent Twin created. Entering OmniNexus..."
+          "Account created. Opening your workspace..."
         );
 
         window.setTimeout(() => {
@@ -664,7 +664,7 @@ export default function Login() {
        */
       setSuccess(
         responseMessage ||
-        "Talent Twin created successfully. You can now authenticate."
+        "Account created successfully. You can now sign in."
       );
 
       setIsLogin(true);
@@ -1288,7 +1288,7 @@ export default function Login() {
                   <h2 className="text-3xl font-black text-white sm:text-4xl">
                     {isLogin
                       ? "Access OmniNexus"
-                      : "Create Talent Twin"}
+                      : "Create account"}
                   </h2>
 
                   <p className="mt-3 max-w-md text-sm leading-6 text-slate-500">
@@ -1726,7 +1726,7 @@ export default function Login() {
 
                   {!isLogin && (
                     <p className="mt-2 text-[10px] text-slate-700">
-                      Minimum security key length:
+                      Minimum password length:
                       6 characters.
                     </p>
                   )}
@@ -1792,8 +1792,8 @@ export default function Login() {
 
                       <span>
                         {isLogin
-                          ? "AUTHENTICATING..."
-                          : "CREATING TWIN..."}
+                          ? "SIGNING IN..."
+                          : "CREATING ACCOUNT..."}
                       </span>
                     </>
                   ) : (
@@ -1840,8 +1840,8 @@ export default function Login() {
               <div className="mt-7 border-t border-slate-800/70 pt-6 text-center">
                 <p className="text-xs text-slate-500">
                   {isLogin
-                    ? "Don't have a Talent Twin?"
-                    : "Already have an identity?"}
+                    ? "Don't have an account?"
+                    : "Already have an account?"}
 
                   <button
                     type="button"
@@ -1859,7 +1859,7 @@ export default function Login() {
                   >
                     {isLogin
                       ? "Create one"
-                      : "Access account"}
+                      : "Sign in"}
                   </button>
                 </p>
               </div>
@@ -1902,7 +1902,7 @@ export default function Login() {
                 />
 
                 <span className="text-[9px] uppercase tracking-widest text-slate-600">
-                  Secure Auth
+                  Secure sign-in
                 </span>
               </div>
 
