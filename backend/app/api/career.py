@@ -1,30 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.security import get_current_user
 from app.database import get_db
-from app.models.user import User
 from app.schemas.career import GraphRequest, ResumeRequest
 from app.services.career_engine import analyze_career_path
 from app.services.resume_service import extract_skills_from_resume
-from app.services.skill_graph import build_skill_graph, get_skill_gaps
+from app.services.skill_graph import build_skill_graph
 
 router = APIRouter(prefix="/api/v1", tags=["career"])
-
-
-@router.get("/admin/users", summary="List registered users")
-def get_all_users(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    users = db.query(User).all()
-    return {"status": "success", "data": [
-        {
-            "uuid": user.uuid,
-            "email": user.email,
-            "role": user.role,
-            "status": user.status,
-            "last_active": user.last_active,
-            "password_hash": user.password_hash,
-        } for user in users
-    ]}
 
 
 @router.post("/parse-resume", summary="Extract skills from resume text")
