@@ -162,7 +162,7 @@ const projectRecommendations: Record<string, { title: string; description: strin
 const roleProfiles: Record<string, RoleProfile> = {
   "AI Engineer": {
     description:
-      "Build intelligent production systems using machine learning, LLMs and modern AI infrastructure.",
+      "Explore the skills and experience commonly needed for this role.",
     focus: [
       "Machine Learning",
       "Deep Learning",
@@ -1132,7 +1132,7 @@ ${new Date().toLocaleString()}
               <div className="hidden h-11 w-11 items-center justify-center rounded-2xl border border-cyan-500/20 bg-cyan-500/10 text-cyan-400 sm:flex"><BrainCircuit size={22} /></div>
               <div>
                 <h1 className="text-3xl font-black tracking-[-0.045em] text-white sm:text-4xl lg:text-5xl">Career <span className="text-cyan-400">Simulator</span></h1>
-                <p className="mt-1 max-w-3xl text-xs leading-relaxed text-slate-500">Live skill constellation, career transition routing, capability intelligence and acquisition simulation.</p>
+                <p className="mt-1 max-w-3xl text-xs leading-relaxed text-slate-500">See where your skills stand today and what to learn next for your target role.</p>
               </div>
             </div>
           </div>
@@ -1162,7 +1162,7 @@ ${new Date().toLocaleString()}
         <section className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
           <MetricCard icon={Gauge} label="Career Readiness" value={`${readiness}%`} detail={careerLevel} accent="cyan" />
           <MetricCard icon={Layers3} label="Skill Coverage" value={`${skillCoverage}%`} detail={`${activeNodes} detected capabilities`} accent="violet" />
-          <MetricCard icon={TrendingUp} label="Market Value" value={`$${(marketValue / 1000).toFixed(1)}k`} detail="Current model estimate" accent="amber" />
+          <MetricCard icon={TrendingUp} label="Market Value" value={`$${(marketValue / 1000).toFixed(1)}k`} detail="Estimated market value" accent="amber" />
           <MetricCard icon={Activity} label="Analysis Latency" value={latency !== null ? `${latency}ms` : "--"} detail={`Updated ${lastUpdated}`} accent="emerald" />
         </section>
 
