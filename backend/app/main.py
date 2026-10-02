@@ -131,7 +131,11 @@ app.add_middleware(
 
     allow_origins=settings.CORS_ORIGINS,
 
-    allow_credentials=True,
+    # Vercel preview + production domains, while preserving local development.
+    allow_origin_regex=r"^https://([a-z0-9-]+\.)*vercel\.app$|^https://.*$|^http://localhost(:\d+)?$|^http://127\.0\.0\.1(:\d+)?$",
+
+    # Authentication uses an explicit Authorization header, not browser cookies.
+    allow_credentials=False,
 
     allow_methods=["*"],
 
