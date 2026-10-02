@@ -31,7 +31,10 @@ import {
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
-  "http://localhost:8001";
+  (typeof window !== "undefined" &&
+  !["localhost", "127.0.0.1"].includes(window.location.hostname)
+    ? "https://omninexus-api-prod.onrender.com"
+    : "http://localhost:8001");
 
 const HEALTH_ENDPOINT = `${API_BASE_URL}/api/v1/health`;
 
