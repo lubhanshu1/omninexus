@@ -300,7 +300,7 @@ const buildLocalGraph = (skills: string[], role: string): { nodes: Node[]; edges
       stroke: index % 2 === 0 ? "#00e5ff" : "#8b7cff",
       strokeWidth: 3,
       opacity: 1,
-      strokeLinecap: "round",
+      strokeLinecap: "round" as const,
       filter: "drop-shadow(0 0 4px rgba(0,229,255,0.45))",
     },
   }));
@@ -1100,7 +1100,7 @@ ${new Date().toLocaleString()}
       stroke: index % 3 === 0 ? "#22d3ee" : "#6366f1",
       strokeWidth: 3,
       opacity: 1,
-      strokeLinecap: "round",
+      strokeLinecap: "round" as const,
       filter: "drop-shadow(0 0 4px rgba(0,229,255,0.45))",
     },
   })), [edges]);
