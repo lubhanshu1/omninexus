@@ -1738,11 +1738,7 @@ export default function Login() {
 
                 <button
                   type="submit"
-                  disabled={
-                    loading ||
-                    healthState ===
-                    "offline"
-                  }
+                  disabled={loading}
                   className="
                     group
                     relative
