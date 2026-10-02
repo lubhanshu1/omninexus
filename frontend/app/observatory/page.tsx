@@ -37,6 +37,7 @@ import {
   ShieldAlert,
   Sparkles,
   Sun,
+  Moon,
   Target,
   TrendingUp,
   Users,
@@ -302,6 +303,8 @@ export default function Observatory() {
     { role: "user" | "assistant"; text: string }[]
   >([]);
   const [compactMode, setCompactMode] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [lastUpdated, setLastUpdated] = useState("just now");
   const [apiStatus, setApiStatus] = useState<"online" | "offline" | "checking">("checking");
   const [apiLatency, setApiLatency] = useState<number | null>(null);
@@ -319,6 +322,37 @@ export default function Observatory() {
     0,
     Math.round(((projectedDemand - projectedSupply) / projectedDemand) * 100)
   );
+
+  const applyTheme = useCallback((nextTheme: "dark" | "light") => {
+    setTheme(nextTheme);
+    document.documentElement.dataset.theme = nextTheme;
+    try {
+      window.localStorage.setItem("omninexus-theme", nextTheme);
+    } catch {}
+  }, []);
+
+  const toggleTheme = useCallback(() => {
+    applyTheme(theme === "dark" ? "light" : "dark");
+  }, [applyTheme, theme]);
+
+  useEffect(() => {
+    try {
+      const savedTheme = window.localStorage.getItem("omninexus-theme");
+      const savedCompact = window.localStorage.getItem("omninexus-compact-mode");
+      const nextTheme = savedTheme === "light" ? "light" : "dark";
+      setTheme(nextTheme);
+      document.documentElement.dataset.theme = nextTheme;
+      if (savedCompact === "true") setCompactMode(true);
+    } catch {
+      document.documentElement.dataset.theme = "dark";
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("omninexus-compact-mode", String(compactMode));
+    } catch {}
+  }, [compactMode]);
 
   const checkSystem = useCallback(async () => {
     const started = performance.now();
@@ -408,6 +442,7 @@ export default function Observatory() {
         setCopilotOpen(false);
         setNotifications(false);
         setMobileNav(false);
+        setSettingsOpen(false);
       }
     };
 
@@ -570,15 +605,26 @@ export default function Observatory() {
               </span>
             </div>
 
-            <Settings
-              size={17}
-              className="hidden cursor-pointer text-slate-500 hover:text-white sm:block"
-            />
+            <button
+              type="button"
+              onClick={() => setSettingsOpen((value) => !value)}
+              aria-label="Open OmniNexus settings"
+              aria-expanded={settingsOpen}
+              className="hidden rounded-xl border border-slate-800 bg-slate-900/50 p-2.5 text-slate-500 transition hover:border-cyan-500/30 hover:text-white sm:block"
+              title="Settings"
+            >
+              <Settings size={17} />
+            </button>
 
-            <Sun
-              size={17}
-              className="hidden cursor-pointer text-slate-500 hover:text-white sm:block"
-            />
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+              className="hidden rounded-xl border border-slate-800 bg-slate-900/50 p-2.5 text-slate-500 transition hover:border-cyan-500/30 hover:text-white sm:block"
+              title={theme === "dark" ? "Light theme" : "Dark theme"}
+            >
+              {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
+            </button>
 
             <div className="hidden h-7 w-px bg-slate-800 sm:block" />
 
@@ -597,6 +643,77 @@ export default function Observatory() {
             </div>
           </div>
         </header>
+
+        {/* SETTINGS PANEL */}
+        {settingsOpen && (
+          <div className="fixed right-4 top-[78px] z-[70] w-[320px] rounded-2xl border border-slate-700 bg-[#0a141f] p-5 shadow-2xl">
+            <div className="mb-5 flex items-start justify-between">
+              <div>
+                <div className="text-sm font-black text-white">Workspace Settings</div>
+                <div className="mt-1 text-[10px] text-slate-500">
+                  Personalise the Observatory without changing your data.
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSettingsOpen(false)}
+                className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-800 hover:text-white"
+                aria-label="Close settings"
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <div>
+                    <div className="text-xs font-bold text-white">Theme</div>
+                    <div className="text-[9px] text-slate-600">Choose your workspace appearance.</div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={toggleTheme}
+                    className="rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-3 py-2 text-[9px] font-black text-cyan-400 hover:bg-cyan-500/10"
+                  >
+                    {theme === "dark" ? "Light" : "Dark"}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setCompactMode((value) => !value)}
+                aria-pressed={compactMode}
+                className="flex w-full items-center justify-between rounded-xl border border-slate-800 bg-slate-950/40 p-3 text-left transition hover:border-slate-700"
+              >
+                <div>
+                  <div className="text-xs font-bold text-white">Compact layout</div>
+                  <div className="text-[9px] text-slate-600">Reduce vertical spacing between panels.</div>
+                </div>
+                <span className={`h-5 w-9 rounded-full p-0.5 transition ${compactMode ? "bg-cyan-500" : "bg-slate-700"}`}>
+                  <span className={`block h-4 w-4 rounded-full transition ${compactMode ? "translate-x-4 bg-slate-950" : "bg-slate-300"}`} />
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setTheme("dark");
+                  setCompactMode(false);
+                  document.documentElement.dataset.theme = "dark";
+                  try {
+                    window.localStorage.removeItem("omninexus-theme");
+                    window.localStorage.removeItem("omninexus-compact-mode");
+                  } catch {}
+                }}
+                className="w-full rounded-xl border border-rose-500/20 bg-rose-500/5 px-3 py-2.5 text-[10px] font-bold text-rose-300 transition hover:bg-rose-500/10"
+              >
+                Reset preferences
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* NOTIFICATION DROPDOWN */}
         {notifications && (
