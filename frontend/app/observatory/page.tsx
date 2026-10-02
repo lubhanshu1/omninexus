@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   Activity,
@@ -320,7 +320,7 @@ export default function Observatory() {
     Math.round(((projectedDemand - projectedSupply) / projectedDemand) * 100)
   );
 
-  const checkSystem = async () => {
+  const checkSystem = useCallback(async () => {
     const started = performance.now();
     try {
       setApiStatus("checking");
@@ -338,7 +338,7 @@ export default function Observatory() {
       setApiLatency(null);
       setApiStatus("offline");
     }
-  };
+  }, []);
 
   const handleRefresh = () => {
     if (refreshing) return;
@@ -352,7 +352,7 @@ export default function Observatory() {
     void checkSystem();
     const interval = window.setInterval(() => void checkSystem(), 30000);
     return () => window.clearInterval(interval);
-  }, []);
+  }, [checkSystem]);
 
   const scrollToSection = (id: string) => {
     document.getElementById(id)?.scrollIntoView({
@@ -494,16 +494,16 @@ export default function Observatory() {
                 System Status
               </span>
               <span className="text-[9px] font-bold text-emerald-400">
-                LIVE
+                {apiStatus === "online" ? "ONLINE" : apiStatus === "offline" ? "OFFLINE" : "CHECKING"}
               </span>
             </div>
 
             <div className="space-y-2.5">
               {[
-                ["Knowledge Graph", "99.98%"],
-                ["Labor Market Stream", "98.7%"],
-                ["Forecast Engine", "99.2%"],
-                ["Data Synchronization", "100%"],
+                ["API Gateway", apiLatency !== null ? String(apiLatency) + "ms" : "—"],
+                ["Career Engine", apiStatus === "online" ? "ONLINE" : "—"],
+                ["Skill Graph", apiStatus === "online" ? "ONLINE" : "—"],
+                ["Data Sync", apiStatus === "online" ? "READY" : "—"],
               ].map(([name, value]) => (
                 <div key={name} className="flex items-center justify-between">
                   <span className="text-[10px] text-slate-500">{name}</span>
