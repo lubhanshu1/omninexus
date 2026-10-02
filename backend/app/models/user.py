@@ -6,13 +6,87 @@ from app.database import Base
 
 
 class User(Base):
+
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    uuid = Column(String, unique=True, index=True, default=lambda: f"usr_{uuid.uuid4().hex[:8]}")
-    email = Column(String, unique=True, index=True, nullable=False)
-    password_hash = Column(String, nullable=False)
-    role = Column(String, default="Talent Node")
-    status = Column(String, default="Active")
-    last_active = Column(String, default="Just now")
-    is_active = Column(Boolean, default=True)
+    # ========================================================
+    # PRIMARY KEY
+    # ========================================================
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True,
+    )
+
+    # ========================================================
+    # PUBLIC USER UUID
+    # ========================================================
+
+    uuid = Column(
+        String(50),
+        unique=True,
+        index=True,
+        nullable=False,
+        default=lambda: f"usr_{uuid.uuid4().hex[:8]}",
+    )
+
+    # ========================================================
+    # EMAIL
+    # ========================================================
+
+    email = Column(
+        String(255),
+        unique=True,
+        index=True,
+        nullable=False,
+    )
+
+    # ========================================================
+    # PASSWORD
+    # ========================================================
+
+    password_hash = Column(
+        String(255),
+        nullable=False,
+    )
+
+    # ========================================================
+    # ROLE
+    # ========================================================
+
+    role = Column(
+        String(100),
+        nullable=False,
+        default="Talent Node",
+    )
+
+    # ========================================================
+    # STATUS
+    # ========================================================
+
+    status = Column(
+        String(50),
+        nullable=False,
+        default="Active",
+    )
+
+    # ========================================================
+    # ACTIVITY
+    # ========================================================
+
+    last_active = Column(
+        String(100),
+        nullable=False,
+        default="Just now",
+    )
+
+    # ========================================================
+    # ACTIVE FLAG
+    # ========================================================
+
+    is_active = Column(
+        Boolean,
+        nullable=False,
+        default=True,
+    )

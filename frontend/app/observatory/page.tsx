@@ -51,18 +51,18 @@ type Skill = {
   demand: number;
   supply: number;
   growth: string;
-  scarcity: string;
+  availabilityPressure: string;
 };
 
 const skills: Skill[] = [
-  { name: "AI Agents", demand: 94, supply: 48, growth: "+48%", scarcity: "Critical" },
-  { name: "RAG", demand: 91, supply: 52, growth: "+39%", scarcity: "High" },
-  { name: "MLOps", demand: 88, supply: 44, growth: "+36%", scarcity: "Critical" },
-  { name: "LLM Engineering", demand: 86, supply: 50, growth: "+31%", scarcity: "High" },
-  { name: "PyTorch", demand: 81, supply: 57, growth: "+24%", scarcity: "High" },
-  { name: "Cloud", demand: 77, supply: 62, growth: "+19%", scarcity: "Medium" },
-  { name: "Docker", demand: 73, supply: 68, growth: "+14%", scarcity: "Medium" },
-  { name: "AWS", demand: 71, supply: 64, growth: "+12%", scarcity: "Medium" },
+  { name: "AI Agents", demand: 94, supply: 48, growth: "+48%", availabilityPressure: "Critical" },
+  { name: "RAG", demand: 91, supply: 52, growth: "+39%", availabilityPressure: "High" },
+  { name: "MLOps", demand: 88, supply: 44, growth: "+36%", availabilityPressure: "Critical" },
+  { name: "LLM Engineering", demand: 86, supply: 50, growth: "+31%", availabilityPressure: "High" },
+  { name: "PyTorch", demand: 81, supply: 57, growth: "+24%", availabilityPressure: "High" },
+  { name: "Cloud", demand: 77, supply: 62, growth: "+19%", availabilityPressure: "Medium" },
+  { name: "Docker", demand: 73, supply: 68, growth: "+14%", availabilityPressure: "Medium" },
+  { name: "AWS", demand: 71, supply: 64, growth: "+12%", availabilityPressure: "Medium" },
 ];
 
 const marketRows = [
@@ -342,19 +342,19 @@ export default function Observatory() {
     if (lower.includes("mlops") || lower.includes("bottleneck")) {
       answer =
         "MLOps is flagged because its indexed demand is high while supply remains comparatively constrained. " +
-        "The current risk monitor gives MLOps a 91/100 risk index, making it the strongest structural bottleneck in this snapshot.";
+        "The current risk monitor gives MLOps a 91/100 risk index, making it the strongest capability constraint in this snapshot.";
     } else if (lower.includes("25%") || lower.includes("demand")) {
       answer =
         `At a +${scenario}% demand scenario, the model projects demand at ${projectedDemand.toLocaleString()} and supply at ${projectedSupply.toLocaleString()}, ` +
         `with a modeled talent gap of ${gap}%.`;
     } else if (lower.includes("transition") || lower.includes("next skill")) {
       answer =
-        "The current transition path is Python → ML/Deep Learning → RAG/PyTorch/MLOps → AI Engineer. " +
+        "The current transition path is Python → ML/Deep Learning → RAG/PyTorch/MLOps → the selected target role. " +
         "MLOps is the next capability highlighted by the recommendation layer.";
     } else if (lower.includes("market") || lower.includes("signal")) {
       answer =
-        "Bengaluru currently has the highest indexed demand in this snapshot, followed by Delhi NCR and Hyderabad. " +
-        "The regional signal is strongest in Bengaluru at +8.4%.";
+        "Bengaluru currently carries the highest indexed demand in this snapshot, followed by Delhi NCR and Hyderabad. " +
+        "The strongest regional momentum signal is currently Bengaluru at +8.4%.";
     }
 
     setCopilotMessages((messages) => [
@@ -469,10 +469,10 @@ export default function Observatory() {
 
             <div className="space-y-2.5">
               {[
-                ["Graph API", "99.98%"],
-                ["Market Feed", "98.7%"],
-                ["Prediction", "99.2%"],
-                ["Data Sync", "100%"],
+                ["Knowledge Graph", "99.98%"],
+                ["Labor Market Stream", "98.7%"],
+                ["Forecast Engine", "99.2%"],
+                ["Data Synchronization", "100%"],
               ].map(([name, value]) => (
                 <div key={name} className="flex items-center justify-between">
                   <span className="text-[10px] text-slate-500">{name}</span>
@@ -535,7 +535,7 @@ export default function Observatory() {
             <div className="hidden items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 sm:flex">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
               <span className="text-[10px] font-black text-emerald-400">
-                GRAPH ONLINE
+                GRAPH SYNCHRONIZED
               </span>
             </div>
 
@@ -571,7 +571,7 @@ export default function Observatory() {
         {notifications && (
           <div className="fixed right-4 top-[78px] z-[60] w-[330px] rounded-2xl border border-slate-700 bg-[#0a141f] p-4 shadow-2xl">
             <div className="mb-4 flex items-center justify-between">
-              <div className="font-black text-white">System Alerts</div>
+              <div className="font-black text-white">Intelligence Alerts</div>
               <button
                 onClick={() => setNotifications(false)}
                 className="text-slate-500 hover:text-white"
@@ -586,10 +586,10 @@ export default function Observatory() {
                   <AlertTriangle size={15} className="text-rose-400" />
                   <div>
                     <div className="text-xs font-bold text-rose-300">
-                      MLOps scarcity elevated
+                      MLOps capability pressure elevated
                     </div>
                     <div className="mt-1 text-[10px] text-slate-500">
-                      Structural risk threshold exceeded.
+                      Capability shortage crossed the monitoring threshold.
                     </div>
                   </div>
                 </div>
@@ -600,10 +600,10 @@ export default function Observatory() {
                   <Radio size={15} className="text-cyan-400" />
                   <div>
                     <div className="text-xs font-bold text-cyan-300">
-                      Market feed synchronized
+                      Market intelligence synchronized
                     </div>
                     <div className="mt-1 text-[10px] text-slate-500">
-                      Latest intelligence snapshot available.
+                      Latest workforce snapshot is available.
                     </div>
                   </div>
                 </div>
@@ -613,15 +613,14 @@ export default function Observatory() {
         )}
 
         <div
-          className={`mx-auto max-w-[1450px] px-4 py-7 pb-44 sm:px-6 lg:px-8 md:pb-36 ${
-            compactMode ? "space-y-6" : "space-y-10"
-          }`}
+          className={`mx-auto max-w-[1450px] px-4 py-7 pb-44 sm:px-6 lg:px-8 md:pb-36 ${compactMode ? "space-y-6" : "space-y-10"
+            }`}
         >
           {/* STATUS STRIP */}
           <div className="flex flex-wrap items-center gap-2">
-            <StatusPill tone="emerald">INTELLIGENCE STREAM ACTIVE</StatusPill>
-            <StatusPill tone="cyan">MARKET FEED CONNECTED</StatusPill>
-            <StatusPill tone="indigo">840K+ GRAPH NODES</StatusPill>
+            <StatusPill tone="emerald">INTELLIGENCE ENGINE ACTIVE</StatusPill>
+            <StatusPill tone="cyan">LABOR MARKET LINKED</StatusPill>
+            <StatusPill tone="indigo">840K+ KNOWLEDGE NODES</StatusPill>
 
             <div className="ml-auto hidden text-[10px] font-bold uppercase tracking-widest text-slate-600 lg:block">
               SNAPSHOT / 23 SEP 2026 / LIVE · UPDATED {lastUpdated.toUpperCase()}
@@ -646,12 +645,12 @@ export default function Observatory() {
                 <h1 className="max-w-4xl text-4xl font-black leading-[0.95] tracking-[-0.04em] text-white md:text-5xl">
                   Workforce intelligence,
                   <span className="block text-cyan-400">
-                    in one view.
+                    built for decisions.
                   </span>
                 </h1>
 
                 <p className="mt-5 max-w-3xl text-sm leading-6 text-slate-500 md:text-base">
-                  Monitor market demand, capability scarcity, workforce risk,
+                  Monitor market demand, capability availability pressure, workforce risk,
                   career economics and structural skill transitions through the
                   OmniNexus intelligence graph.
                 </p>
@@ -659,7 +658,7 @@ export default function Observatory() {
 
               <div>
                 <label className="mb-2 block text-[9px] font-black uppercase tracking-[0.2em] text-slate-600">
-                  Intelligence Target
+                  Analysis Target
                 </label>
 
                 <div className="relative">
@@ -693,34 +692,34 @@ export default function Observatory() {
           <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
             <MetricCard
               icon={Activity}
-              label="AI Demand Index"
+              label="Demand Velocity"
               value="5,839"
-              sub="Sector benchmark"
+              sub="Indexed market pressure"
               trend="+8.2%"
               tone="cyan"
             />
 
             <MetricCard
               icon={Users}
-              label="Talent Supply"
+              label="Talent Availability"
               value="3,421"
-              sub="Indexed talent pool"
+              sub="Indexed workforce capacity"
               trend="+3.4%"
               tone="emerald"
             />
 
             <MetricCard
               icon={GitBranch}
-              label="Skill Gap"
+              label="Capability Deficit"
               value="41.5%"
-              sub="Demand vs supply"
+              sub="Demand versus availability"
               trend="WATCH"
               tone="rose"
             />
 
             <MetricCard
               icon={CircleDollarSign}
-              label="Market Value"
+              label="Compensation Signal"
               value="₹14.45L"
               sub={`${target} average`}
               trend="+6.1%"
@@ -729,9 +728,9 @@ export default function Observatory() {
 
             <MetricCard
               icon={LineChart}
-              label="30D Signal"
+              label="30-Day Momentum"
               value="+4.2%"
-              sub="Market movement"
+              sub="30-day market movement"
               trend="RISING"
               tone="emerald"
             />
@@ -740,52 +739,51 @@ export default function Observatory() {
           {/* QUICK COMMAND BAR */}
           <section className="flex flex-wrap items-center gap-2 rounded-2xl border border-slate-800 bg-[#09131e] p-2">
             {[
-              "Overview",
-              "Forecast",
+              "Command Overview",
+              "Demand Forecast",
               "Skills",
               "Risk",
               "Scenarios",
-              "AI Copilot",
+              "Intelligence Copilot",
             ].map((item, index) => (
               <button
                 key={item}
                 onClick={() => {
                   const sectionMap: Record<string, string> = {
-                    Overview: "overview",
-                    Forecast: "forecast",
+                    "Command Overview": "overview",
+                    "Demand Forecast": "forecast",
                     Skills: "skills",
                     Risk: "risk",
                     Scenarios: "scenarios",
                   };
 
-                  if (item === "AI Copilot") {
+                  if (item === "Intelligence Copilot") {
                     setCopilotOpen(true);
                     return;
                   }
 
                   scrollToSection(sectionMap[item]);
                 }}
-                className={`rounded-xl px-4 py-2.5 text-[10px] font-black transition ${
-                  index === 0
-                    ? "bg-cyan-500/10 text-cyan-400"
-                    : "text-slate-500 hover:bg-slate-800 hover:text-white"
-                }`}
+                className={`rounded-xl px-4 py-2.5 text-[10px] font-black transition ${index === 0
+                  ? "bg-cyan-500/10 text-cyan-400"
+                  : "text-slate-500 hover:bg-slate-800 hover:text-white"
+                  }`}
               >
                 {item}
               </button>
             ))}
 
             <div className="ml-auto hidden text-[9px] font-bold uppercase tracking-widest text-slate-600 md:block">
-              LIVE GRAPH / {target}
+              LIVE INTELLIGENCE / {target}
             </div>
           </section>
 
           {/* FORECAST + HEALTH */}
           <section id="forecast" className="scroll-mt-24">
             <SectionHeader
-              eyebrow="01 / Market Intelligence"
+              eyebrow="01 / Market Signals"
               title="Demand trajectory"
-              description="Live market projection based on capability demand, indexed talent supply and graph-derived structural signals."
+              description="Projected workforce demand derived from capability momentum, talent availability and graph-based market signals."
               action={
                 <div className="flex rounded-xl border border-slate-800 bg-[#09131e] p-1">
                   {(["7D", "30D", "90D", "1Y"] as ForecastRange[]).map(
@@ -815,7 +813,7 @@ export default function Observatory() {
                       {target} demand trajectory
                     </div>
                     <div className="mt-1 text-[10px] text-slate-600">
-                      Forecast window: {range}
+                      Model projection horizon: {range}
                     </div>
                   </div>
 
@@ -826,7 +824,7 @@ export default function Observatory() {
                     </span>
                     <span className="flex items-center gap-2 text-indigo-400">
                       <span className="h-1.5 w-5 rounded-full bg-indigo-400" />
-                      Projection
+                      Model projection
                     </span>
                   </div>
                 </div>
@@ -903,8 +901,8 @@ export default function Observatory() {
 
                 <div className="mt-4 grid grid-cols-3 gap-3">
                   {[
-                    ["Current demand", "5,839"],
-                    ["Projected demand", "6,921"],
+                    ["Current market demand", "5,839"],
+                    ["Projected market demand", "6,921"],
                     ["Confidence", "92%"],
                   ].map(([label, value]) => (
                     <div
@@ -937,8 +935,8 @@ export default function Observatory() {
 
                 <div className="space-y-3">
                   {[
-                    ["Graph API", "99.98%", "emerald"],
-                    ["Market Intelligence", "98.7%", "emerald"],
+                    ["Knowledge Graph", "99.98%", "emerald"],
+                    ["Market Signals", "98.7%", "emerald"],
                     ["Forecast Engine", "96.4%", "cyan"],
                     ["Skill Index", "94.8%", "cyan"],
                     ["Risk Monitor", "91.2%", "amber"],
@@ -990,9 +988,9 @@ export default function Observatory() {
           {/* CHANGES + DECISION */}
           <section id="changes" className="scroll-mt-24">
             <SectionHeader
-              eyebrow="02 / Intelligence Stream"
-              title="What changed?"
-              description="The latest material movements detected by the workforce intelligence graph."
+              eyebrow="02 / Market Change Stream"
+              title="What moved?"
+              description="The latest meaningful changes detected across skills, roles and labor-market signals."
             />
 
             <div className="grid gap-5 xl:grid-cols-[1.6fr_0.8fr]">
@@ -1062,7 +1060,7 @@ export default function Observatory() {
                     <div className="flex items-center gap-2">
                       <Sparkles size={16} className="text-cyan-400" />
                       <span className="text-[10px] font-black uppercase tracking-[0.18em] text-cyan-400">
-                        AI Decision Center
+                        AI Strategy Center
                       </span>
                     </div>
 
@@ -1072,7 +1070,7 @@ export default function Observatory() {
                   </div>
 
                   <h3 className="text-2xl font-black tracking-tight text-white">
-                    Prioritize MLOps + RAG
+                    Accelerate MLOps + RAG
                   </h3>
 
                   <p className="mt-3 text-xs leading-6 text-slate-500">
@@ -1083,9 +1081,9 @@ export default function Observatory() {
 
                   <div className="mt-5 space-y-2">
                     {[
-                      ["Primary bottleneck", "MLOps"],
-                      ["Downstream dependencies", "5"],
-                      ["Market signal", "Strong"],
+                      ["Primary capability constraint", "MLOps"],
+                      ["Connected dependencies", "5"],
+                      ["Market momentum", "Strong"],
                       ["Transition value", "+14.8%"],
                     ].map(([label, value]) => (
                       <div
@@ -1107,7 +1105,7 @@ export default function Observatory() {
                       onClick={() => setCopilotOpen(true)}
                       className="flex items-center justify-center gap-2 rounded-xl bg-cyan-500 px-3 py-3 text-[10px] font-black text-[#041018] transition hover:bg-cyan-300"
                     >
-                      Ask AI Copilot
+                      Ask Intelligence Copilot
                       <ArrowRight size={13} />
                     </button>
 
@@ -1115,7 +1113,7 @@ export default function Observatory() {
                       onClick={() => scrollToSection("scenarios")}
                       className="rounded-xl border border-slate-700 bg-slate-900/60 px-3 py-3 text-[10px] font-black text-slate-300 transition hover:border-cyan-500/30 hover:text-white"
                     >
-                      Open Scenario
+                      Model Scenario
                     </button>
                   </div>
                 </div>
@@ -1126,15 +1124,15 @@ export default function Observatory() {
           {/* SKILL INTELLIGENCE */}
           <section id="skills" className="scroll-mt-24">
             <SectionHeader
-              eyebrow="03 / Capability Intelligence"
-              title="Skill demand intelligence"
-              description="Compare market demand, indexed talent supply and growth pressure across high-impact capabilities."
+              eyebrow="03 / Capability Signals"
+              title="Capability demand intelligence"
+              description="Compare demand, talent availability and growth pressure across high-impact capabilities."
               action={
                 <button
                   onClick={() => setShowAllSkills((v) => !v)}
                   className="rounded-lg border border-slate-800 bg-[#09131e] px-3 py-2 text-[9px] font-black text-slate-400 hover:text-white"
                 >
-                  {showAllSkills ? "Collapse" : "Expand Intelligence"}
+                  {showAllSkills ? "Collapse" : "Expand Analysis"}
                 </button>
               }
             />
@@ -1145,7 +1143,7 @@ export default function Observatory() {
                   <span>Capability</span>
                   <span>Demand</span>
                   <span>Supply</span>
-                  <span>Growth</span>
+                  <span>Growth rate</span>
                 </div>
 
                 <div className="space-y-3">
@@ -1207,7 +1205,7 @@ export default function Observatory() {
                 <div className="mb-5 flex items-center gap-2">
                   <Zap size={16} className="text-amber-400" />
                   <span className="text-[10px] font-black uppercase tracking-[0.18em] text-amber-400">
-                    Early Market Signals
+                    Emerging Market Signals
                   </span>
                 </div>
 
@@ -1226,7 +1224,7 @@ export default function Observatory() {
                           {skill.name}
                         </div>
                         <div className="mt-1 text-[8px] text-slate-600">
-                          {skill.scarcity} scarcity
+                          {skill.availabilityPressure} availability pressure
                         </div>
                       </div>
 
@@ -1243,16 +1241,16 @@ export default function Observatory() {
           {/* CAPABILITY GRAPH */}
           <section id="graph" className="scroll-mt-24">
             <SectionHeader
-              eyebrow="04 / Structural Graph"
+              eyebrow="04 / Capability Graph"
               title="Workforce capability graph"
-              description="Explore how current capabilities connect to intermediate skills and the selected target role."
+              description="Trace how foundational capabilities connect to transition skills and the selected destination role."
               action={
                 <div className="flex items-center gap-2">
                   <span className="hidden text-[9px] text-slate-600 sm:block">
                     LIVE GRAPH
                   </span>
                   <button
-                    onClick={() => askCopilot("Explain the workforce capability graph for this target role.")}
+                    onClick={() => askCopilot("Explain the workforce capability graph for this destination role.")}
                     className="rounded-lg border border-slate-800 p-2 text-slate-500 transition hover:border-cyan-500/30 hover:text-cyan-400"
                     title="Ask Copilot about the graph"
                   >
@@ -1359,7 +1357,7 @@ export default function Observatory() {
                   <GraphNode tone="emerald">
                     <div>Python</div>
                     <div className="mt-1 text-[8px] font-medium opacity-60">
-                      acquired capability
+                      existing capability
                     </div>
                   </GraphNode>
                 </div>
@@ -1373,7 +1371,7 @@ export default function Observatory() {
                 </div>
 
                 <div className="absolute left-[34%] top-[68%] w-[145px] md:w-[170px]">
-                  <GraphNode>Cloud / Docker</GraphNode>
+                  <GraphNode>Cloud Infrastructure</GraphNode>
                 </div>
 
                 <div className="absolute left-[57%] top-[25%] w-[145px] md:w-[170px]">
@@ -1393,9 +1391,9 @@ export default function Observatory() {
                     Target
                   </div>
                   <GraphNode tone="violet">
-                    <div className="text-sm">AI Engineer</div>
+                    <div className="text-sm">{target}</div>
                     <div className="mt-1 text-[8px] font-medium opacity-60">
-                      target role
+                      destination role
                     </div>
                   </GraphNode>
                 </div>
@@ -1421,9 +1419,9 @@ export default function Observatory() {
           {/* MARKET HEATMAP */}
           <section id="market" className="scroll-mt-24">
             <SectionHeader
-              eyebrow="05 / Geographic Intelligence"
-              title="Workforce market heatmap"
-              description="Regional demand, supply and market-value signals for the selected capability class."
+              eyebrow="05 / Regional Intelligence"
+              title="Regional workforce market"
+              description="Regional demand, talent availability and compensation signals for the selected capability."
             />
 
             <div className="grid gap-5 xl:grid-cols-[1.5fr_0.8fr]">
@@ -1479,7 +1477,7 @@ export default function Observatory() {
 
               <div className="rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-indigo-500/[0.08] to-[#09131e] p-6">
                 <div className="mb-2 text-[9px] font-black uppercase tracking-widest text-indigo-400">
-                  Highest Demand
+                  Strongest Demand Signal
                 </div>
 
                 <h3 className="text-3xl font-black text-white">
@@ -1495,9 +1493,9 @@ export default function Observatory() {
                   {[
                     ["Talent availability", "71%"],
                     ["Demand intensity", "94%"],
-                    ["Salary signal", "+8.4%"],
+                    ["Compensation momentum", "+8.4%"],
                     ["Hiring pressure", "HIGH"],
-                    ["Role velocity", "3.4x"],
+                    ["Role growth velocity", "3.4x"],
                   ].map(([name, value]) => (
                     <div
                       key={name}
@@ -1517,9 +1515,9 @@ export default function Observatory() {
           {/* SCENARIO SIMULATOR */}
           <section id="scenarios" className="scroll-mt-24">
             <SectionHeader
-              eyebrow="06 / Scenario Intelligence"
-              title="Scenario simulator"
-              description="Model workforce conditions under different demand-growth assumptions."
+              eyebrow="06 / Scenario Modeling"
+              title="Workforce scenario simulator"
+              description="Stress-test workforce conditions under different market-growth assumptions."
             />
 
             <div className="rounded-2xl border border-slate-800 bg-[#09131e] p-5 md:p-7">
@@ -1528,10 +1526,10 @@ export default function Observatory() {
                   <div className="mb-4 flex items-center justify-between">
                     <div>
                       <div className="text-sm font-black text-white">
-                        AI demand scenario
+                        Market demand scenario
                       </div>
                       <div className="mt-1 text-[10px] text-slate-600">
-                        Adjust projected market growth.
+                        Adjust projected demand growth.
                       </div>
                     </div>
 
@@ -1561,7 +1559,7 @@ export default function Observatory() {
                     <div className="flex items-center gap-2">
                       <BrainCircuit size={15} className="text-cyan-400" />
                       <span className="text-[10px] font-black text-cyan-400">
-                        Scenario interpretation
+                        Scenario readout
                       </span>
                     </div>
 
@@ -1569,14 +1567,14 @@ export default function Observatory() {
                       At a +{scenario}% demand increase, the projected talent
                       gap reaches approximately{" "}
                       <span className="font-black text-white">{gap}%</span>.
-                      This increases pressure on scarce transition skills.
+                      Higher demand increases pressure on constrained transition capabilities.
                     </p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-2">
                   {[
-                    ["Projected demand", projectedDemand.toLocaleString(), "+25%"],
+                    ["Projected market demand", projectedDemand.toLocaleString(), "+25%"],
                     ["Projected supply", projectedSupply.toLocaleString(), "+10%"],
                     ["Skill gap", `${gap}%`, "elevated"],
                     ["Market value", "₹16.1L", "+11.4%"],
@@ -1605,8 +1603,8 @@ export default function Observatory() {
           <section id="risk" className="scroll-mt-24">
             <SectionHeader
               eyebrow="07 / Workforce Risk"
-              title="Structural risk monitor"
-              description="Monitor capability bottlenecks and workforce conditions that can affect role transitions."
+              title="Capability risk monitor"
+              description="Monitor capability bottlenecks and workforce conditions that can disrupt role transitions."
             />
 
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-5">
@@ -1647,7 +1645,7 @@ export default function Observatory() {
                     </div>
 
                     <div className="mt-2 flex justify-between text-[8px] text-slate-600">
-                      <span>Risk index</span>
+                      <span>Exposure index</span>
                       <span>{risk.score}/100</span>
                     </div>
                   </div>
@@ -1664,12 +1662,12 @@ export default function Observatory() {
                   <div className="mb-2 flex items-center gap-2">
                     <Sparkles size={15} className="text-cyan-400" />
                     <span className="text-[9px] font-black uppercase tracking-[0.2em] text-cyan-400">
-                      Capability Recommendation Engine
+                      Transition Intelligence Engine
                     </span>
                   </div>
 
                   <h2 className="text-2xl font-black tracking-tight text-white md:text-3xl">
-                    Next capability transition:{" "}
+                    Next capability to activate:{" "}
                     <span className="text-cyan-400">MLOps</span>
                   </h2>
 
@@ -1685,14 +1683,14 @@ export default function Observatory() {
                     onClick={() => setCopilotOpen(true)}
                     className="rounded-xl bg-cyan-400 px-4 py-3 text-[10px] font-black text-[#041018] hover:bg-cyan-300"
                   >
-                    Simulate Transition
+                    Simulate Capability Shift
                   </button>
 
                   <Link
                     href="/recruiter"
                     className="rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-center text-[10px] font-black text-slate-300 transition hover:border-cyan-500/30 hover:text-white"
                   >
-                    Find Talent
+                    Source Talent
                   </Link>
                 </div>
               </div>
@@ -1702,9 +1700,9 @@ export default function Observatory() {
           {/* SYSTEM TELEMETRY */}
           <section>
             <SectionHeader
-              eyebrow="08 / System Telemetry"
-              title="OmniNexus infrastructure"
-              description="Live health of the intelligence stack powering the Observatory."
+              eyebrow="08 / Platform Telemetry"
+              title="OmniNexus intelligence infrastructure"
+              description="Live health of the intelligence stack powering the Workforce Command."
             />
 
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -1712,25 +1710,25 @@ export default function Observatory() {
                 {
                   icon: Database,
                   value: "840K+",
-                  label: "Graph nodes",
+                  label: "Knowledge graph nodes",
                   status: "SYNCED",
                 },
                 {
                   icon: Radio,
                   value: "99.98%",
-                  label: "API uptime",
+                  label: "Service availability",
                   status: "HEALTHY",
                 },
                 {
                   icon: Cloud,
                   value: "3.2ms",
-                  label: "Graph latency",
+                  label: "Graph response latency",
                   status: "OPTIMAL",
                 },
                 {
                   icon: Shield,
                   value: "5 AXES",
-                  label: "Risk coverage",
+                  label: "Risk dimensions",
                   status: "ACTIVE",
                 },
               ].map((item) => {
@@ -1765,7 +1763,7 @@ export default function Observatory() {
                 <div className="mb-3 flex items-center gap-2">
                   <Target size={16} className="text-violet-400" />
                   <span className="text-[10px] font-black uppercase tracking-[0.2em] text-violet-400">
-                    Executive Decision Layer
+                    Executive Intelligence Layer
                   </span>
                 </div>
 
@@ -1811,13 +1809,13 @@ export default function Observatory() {
               <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/[0.035] p-5">
                 <div className="mb-4 flex items-center justify-between">
                   <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">
-                    Recommended Action
+                    Recommended Next Action
                   </span>
                   <CheckCircle2 size={16} className="text-emerald-400" />
                 </div>
 
                 <div className="text-xl font-black text-white">
-                  Upskill MLOps
+                  Develop MLOps capability
                 </div>
 
                 <p className="mt-2 text-[10px] leading-5 text-slate-500">
@@ -1829,7 +1827,7 @@ export default function Observatory() {
                   onClick={() => setCopilotOpen(true)}
                   className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-400 py-3 text-[10px] font-black text-[#041018] hover:bg-cyan-300"
                 >
-                  Analyze With AI
+                  Analyze with Copilot
                   <ArrowRight size={13} />
                 </button>
               </div>
@@ -1845,7 +1843,7 @@ export default function Observatory() {
       <button
         onClick={() => setCopilotOpen(true)}
         className="fixed bottom-28 right-5 z-[70] flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-500 text-[#041018] shadow-[0_0_35px_rgba(34,211,238,0.25)] transition hover:scale-105 hover:bg-cyan-300 md:bottom-24 md:right-8"
-        title="Open OmniNexus AI Copilot"
+        title="Open OmniNexus Intelligence Copilot"
       >
         <BrainCircuit size={22} />
       </button>
@@ -1862,11 +1860,11 @@ export default function Observatory() {
 
                 <div>
                   <div className="text-sm font-black text-white">
-                    OmniNexus Copilot
+                    OmniNexus Intelligence Copilot
                   </div>
                   <div className="flex items-center gap-2 text-[9px] text-emerald-400">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                    Intelligence graph connected
+                    Knowledge graph connected
                   </div>
                 </div>
               </div>
@@ -1884,7 +1882,7 @@ export default function Observatory() {
                 <div className="mb-2 flex items-center gap-2">
                   <Sparkles size={14} className="text-cyan-400" />
                   <span className="text-[9px] font-black uppercase tracking-widest text-cyan-400">
-                    AI Analysis
+                    Live AI Analysis
                   </span>
                 </div>
 
@@ -1900,11 +1898,10 @@ export default function Observatory() {
               {copilotMessages.map((message, index) => (
                 <div
                   key={`${message.role}-${index}`}
-                  className={`rounded-2xl border p-4 ${
-                    message.role === "user"
-                      ? "ml-8 border-indigo-500/20 bg-indigo-500/[0.04]"
-                      : "mr-4 border-cyan-500/20 bg-cyan-500/[0.035]"
-                  }`}
+                  className={`rounded-2xl border p-4 ${message.role === "user"
+                    ? "ml-8 border-indigo-500/20 bg-indigo-500/[0.04]"
+                    : "mr-4 border-cyan-500/20 bg-cyan-500/[0.035]"
+                    }`}
                 >
                   <div className="mb-2 text-[8px] font-black uppercase tracking-widest text-slate-600">
                     {message.role === "user" ? "You" : "OmniNexus AI"}
@@ -1916,10 +1913,10 @@ export default function Observatory() {
               ))}
 
               {[
-                "Why is MLOps currently a bottleneck?",
-                "What happens if AI demand rises 25%?",
-                "Show the next capability transition.",
-                "Explain the market signal.",
+                "Why is MLOps currently a capability constraint?",
+                "What happens if market demand rises 25%?",
+                "What should the next capability transition be?",
+                "Explain the current regional market signal.",
               ].map((question) => (
                 <button
                   key={question}
@@ -1933,16 +1930,16 @@ export default function Observatory() {
 
               <div className="rounded-2xl border border-slate-800 bg-[#09131e] p-4">
                 <div className="mb-3 text-[9px] font-black uppercase tracking-widest text-slate-600">
-                  Current Intelligence Context
+                  Active Intelligence Context
                 </div>
 
                 <div className="space-y-2">
                   {[
-                    ["Target role", target],
+                    ["Analysis target", target],
                     ["Demand index", "5,839"],
                     ["Talent supply", "3,421"],
                     ["Skill gap", "41.5%"],
-                    ["Primary bottleneck", "MLOps"],
+                    ["Primary capability constraint", "MLOps"],
                   ].map(([label, value]) => (
                     <div
                       key={label}
@@ -1963,11 +1960,26 @@ export default function Observatory() {
             <div className="border-t border-slate-800 p-4">
               <div className="flex items-center gap-2 rounded-xl border border-slate-800 bg-[#050a10] p-2">
                 <input
-                  placeholder="Ask OmniNexus anything..."
+                  value={copilotInput}
+                  onChange={(e) => setCopilotInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      askCopilot();
+                    }
+                  }}
+                  placeholder="Ask the intelligence layer anything..."
                   className="flex-1 bg-transparent px-2 py-2 text-xs text-white outline-none placeholder:text-slate-700"
+                  aria-label="Ask OmniNexus Intelligence Copilot"
                 />
 
-                <button className="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-400 text-[#041018]">
+                <button
+                  type="button"
+                  onClick={() => askCopilot()}
+                  disabled={!copilotInput.trim()}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-400 text-[#041018] transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-30"
+                  title="Send query"
+                >
                   <ArrowUpRight size={15} />
                 </button>
               </div>
@@ -2009,7 +2021,7 @@ export default function Observatory() {
               href="/database"
               className="hidden shrink-0 rounded-xl px-4 py-2.5 text-[10px] font-bold text-slate-500 transition hover:bg-slate-800/70 hover:text-white sm:block"
             >
-              System DB
+              Knowledge DB
             </Link>
           </div>
 
@@ -2038,7 +2050,7 @@ export default function Observatory() {
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="shrink-0 rounded-xl border border-slate-800 px-3 py-2.5 text-[9px] font-black text-slate-500 transition hover:border-slate-700 hover:text-white"
-            title="Back to top"
+            title="Return to command top"
           >
             ↑
           </button>
@@ -2110,16 +2122,20 @@ function SidebarLinks({
 
         <nav className="space-y-1">
           {[
-            [Network, "Skill Intelligence"],
-            [Globe2, "Market Intelligence"],
-            [ShieldAlert, "Workforce Risk"],
-          ].map(([Icon, label]) => (
+            [Network, "Capability Intelligence", "skills"],
+            [Globe2, "Market Signals", "market"],
+            [ShieldAlert, "Workforce Risk Monitor", "risk"],
+          ].map(([Icon, label, section]) => (
             <button
               key={label as string}
-              className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium transition ${label === "Workforce Risk"
-                ? "bg-slate-800/40 text-slate-300"
-                : "text-slate-500 hover:bg-slate-800/50 hover:text-white"
-                }`}
+              type="button"
+              onClick={() =>
+                document.getElementById(section as string)?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                })
+              }
+              className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium text-slate-500 transition hover:bg-slate-800/50 hover:text-white"
             >
               <Icon size={16} />
               {label as string}
@@ -2144,14 +2160,12 @@ function SidebarLinks({
           </span>
 
           <span
-            className={`h-4 w-7 rounded-full p-0.5 transition ${
-              compactMode ? "bg-cyan-500" : "bg-slate-700"
-            }`}
+            className={`h-4 w-7 rounded-full p-0.5 transition ${compactMode ? "bg-cyan-500" : "bg-slate-700"
+              }`}
           >
             <span
-              className={`block h-3 w-3 rounded-full transition ${
-                compactMode ? "translate-x-3 bg-slate-950" : "bg-slate-300"
-              }`}
+              className={`block h-3 w-3 rounded-full transition ${compactMode ? "translate-x-3 bg-slate-950" : "bg-slate-300"
+                }`}
             />
           </span>
         </button>

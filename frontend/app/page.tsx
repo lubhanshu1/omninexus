@@ -1,1609 +1,748 @@
-﻿"use client";
-
+﻿import Link from "next/link";
 import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+  Activity,
+  ArrowUpRight,
+  BarChart3,
+  BrainCircuit,
+  BriefcaseBusiness,
+  Database,
+  Gauge,
+  Network,
+  Radar,
+  ShieldCheck,
+  Sparkles,
+  Target,
+  TrendingUp,
+  Users,
+  Zap,
+} from "lucide-react";
 
-import {
-  ReactFlow,
-  Background,
-  Controls,
-  Panel,
-  addEdge,
-  useNodesState,
-  useEdgesState,
-  type Node,
-  type Edge,
-  type Connection,
-  type NodeMouseHandler,
-} from "@xyflow/react";
-
-import "@xyflow/react/dist/style.css";
-
-/* =========================================================
-   CONFIG
-========================================================= */
-
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001";
-
-/* =========================================================
-   TYPES
-========================================================= */
-
-type AnalysisResponse = {
-  status?: string;
-  flow_nodes?: Node[];
-  flow_edges?: Edge[];
-  readiness_score?: number;
-  bottleneck_skill?: string;
-  market_value?: number;
-  message?: string;
-};
-
-type ParseResumeResponse = {
-  status?: string;
-  extracted_skills?: string[];
-  message?: string;
-};
-
-type ApiStatus = "online" | "offline" | "checking";
-
-type SkillMeta = {
-  importance: number;
-  demand: number;
-  difficulty: number;
-  learningTime: string;
-  category: string;
-  description: string;
-  prerequisites: string[];
-  nextSkills: string[];
-};
-
-/* =========================================================
-   SKILL INTELLIGENCE DATABASE
-   Frontend metadata only.
-   Backend analysis remains the source of truth for scores.
-========================================================= */
-
-const SKILL_INTELLIGENCE: Record<string, SkillMeta> = {
-  Python: {
-    importance: 95,
-    demand: 96,
-    difficulty: 35,
-    learningTime: "4–8 weeks",
-    category: "Programming",
+const modules = [
+  {
+    title: "Career Simulator",
     description:
-      "Core programming capability used across AI, data science, automation and backend engineering.",
-    prerequisites: [],
-    nextSkills: ["Machine Learning", "Data Analysis", "Cloud Computing"],
+      "Simulate career transitions, identify capability gaps and build an upskilling trajectory.",
+    href: "/career-simulator",
+    icon: Sparkles,
+    accent: "cyan",
+    metric: "16%",
+    metricLabel: "Current alignment",
   },
-
-  "Machine Learning": {
-    importance: 96,
-    demand: 95,
-    difficulty: 68,
-    learningTime: "6–10 weeks",
-    category: "Artificial Intelligence",
+  {
+    title: "Talent Matcher",
     description:
-      "Fundamental capability for building predictive models and intelligent systems.",
-    prerequisites: ["Python", "Data Analysis"],
-    nextSkills: ["Deep Learning", "MLOps", "PyTorch"],
+      "Analyze candidate capability, role alignment and workforce fit through the talent intelligence layer.",
+    href: "/recruiter",
+    icon: Network,
+    accent: "violet",
+    metric: "84%",
+    metricLabel: "Match intelligence",
   },
-
-  "Deep Learning": {
-    importance: 94,
-    demand: 92,
-    difficulty: 82,
-    learningTime: "8–14 weeks",
-    category: "Artificial Intelligence",
+  {
+    title: "Workforce Observatory",
     description:
-      "Advanced neural-network capability for computer vision, NLP and modern AI systems.",
-    prerequisites: ["Python", "Machine Learning"],
-    nextSkills: ["PyTorch", "LLMs"],
+      "Monitor demand, supply, skill gaps, market movement and workforce risk in one intelligence view.",
+    href: "/observatory",
+    icon: Radar,
+    accent: "emerald",
+    metric: "99.2%",
+    metricLabel: "Prediction signal",
   },
-
-  PyTorch: {
-    importance: 91,
-    demand: 90,
-    difficulty: 76,
-    learningTime: "5–8 weeks",
-    category: "AI Framework",
+  {
+    title: "System Database",
     description:
-      "Deep-learning framework used for model development, experimentation and production AI.",
-    prerequisites: ["Python", "Deep Learning"],
-    nextSkills: ["LLMs", "MLOps"],
+      "Explore the underlying workforce graph, capabilities, roles, skills and intelligence records.",
+    href: "/database",
+    icon: Database,
+    accent: "amber",
+    metric: "840K+",
+    metricLabel: "Graph nodes",
   },
+];
 
-  LLMs: {
-    importance: 98,
-    demand: 99,
-    difficulty: 84,
-    learningTime: "6–12 weeks",
-    category: "Generative AI",
-    description:
-      "Large Language Model capability for building modern generative-AI applications.",
-    prerequisites: ["Python", "Deep Learning"],
-    nextSkills: ["RAG", "AI Agents"],
+const systemSignals = [
+  {
+    name: "Graph API",
+    value: "99.98%",
+    status: "Operational",
+    icon: Network,
   },
-
-  RAG: {
-    importance: 93,
-    demand: 96,
-    difficulty: 80,
-    learningTime: "3–6 weeks",
-    category: "Generative AI",
-    description:
-      "Retrieval-Augmented Generation combines language models with external knowledge sources.",
-    prerequisites: ["LLMs"],
-    nextSkills: ["AI Agents"],
+  {
+    name: "Market Intelligence",
+    value: "98.7%",
+    status: "Connected",
+    icon: TrendingUp,
   },
-
-  "AI Agents": {
-    importance: 96,
-    demand: 98,
-    difficulty: 87,
-    learningTime: "4–8 weeks",
-    category: "Agentic AI",
-    description:
-      "Capability for creating systems that reason, use tools and execute multi-step workflows.",
-    prerequisites: ["LLMs", "RAG"],
-    nextSkills: ["MLOps", "Cloud Computing"],
+  {
+    name: "Forecast Engine",
+    value: "96.4%",
+    status: "Operational",
+    icon: BarChart3,
   },
-
-  "Cloud Computing": {
-    importance: 88,
-    demand: 94,
-    difficulty: 65,
-    learningTime: "5–8 weeks",
-    category: "Cloud",
-    description:
-      "Cloud infrastructure knowledge for deploying scalable software and AI systems.",
-    prerequisites: ["Python"],
-    nextSkills: ["AWS", "Docker"],
+  {
+    name: "Risk Monitor",
+    value: "91.8%",
+    status: "Active",
+    icon: ShieldCheck,
   },
+];
 
-  AWS: {
-    importance: 90,
-    demand: 97,
-    difficulty: 63,
-    learningTime: "4–8 weeks",
-    category: "Cloud",
-    description:
-      "Cloud platform capability for deploying, scaling and operating production systems.",
-    prerequisites: ["Cloud Computing"],
-    nextSkills: ["Docker", "MLOps"],
-  },
-
-  Docker: {
-    importance: 84,
-    demand: 92,
-    difficulty: 55,
-    learningTime: "2–4 weeks",
-    category: "Infrastructure",
-    description:
-      "Containerization capability for reproducible development and deployment.",
-    prerequisites: ["Python"],
-    nextSkills: ["Kubernetes", "MLOps"],
-  },
-
-  Kubernetes: {
-    importance: 82,
-    demand: 88,
-    difficulty: 85,
-    learningTime: "5–9 weeks",
-    category: "Infrastructure",
-    description:
-      "Container orchestration capability for distributed production workloads.",
-    prerequisites: ["Docker", "Cloud Computing"],
-    nextSkills: ["MLOps"],
-  },
-
-  MLOps: {
-    importance: 97,
-    demand: 94,
-    difficulty: 86,
-    learningTime: "6–10 weeks",
-    category: "Machine Learning Operations",
-    description:
-      "Production ML capability covering deployment, monitoring, automation and model lifecycle management.",
-    prerequisites: ["Machine Learning", "Docker", "Cloud Computing"],
-    nextSkills: ["Kubernetes", "CI/CD"],
-  },
-
-  "CI/CD": {
-    importance: 80,
-    demand: 90,
-    difficulty: 58,
-    learningTime: "2–5 weeks",
-    category: "DevOps",
-    description:
-      "Automation capability for continuously testing, integrating and deploying software.",
-    prerequisites: ["Docker"],
-    nextSkills: ["MLOps", "Kubernetes"],
-  },
-
-  SQL: {
-    importance: 86,
-    demand: 96,
-    difficulty: 45,
-    learningTime: "3–6 weeks",
-    category: "Data",
-    description:
-      "Database querying capability required across data, backend and analytics roles.",
-    prerequisites: [],
-    nextSkills: ["Data Analysis"],
-  },
-
-  "Data Analysis": {
-    importance: 91,
-    demand: 94,
-    difficulty: 55,
-    learningTime: "4–8 weeks",
-    category: "Data",
-    description:
-      "Capability for extracting insights from structured and unstructured data.",
-    prerequisites: ["Python", "SQL"],
-    nextSkills: ["Machine Learning"],
-  },
-};
-
-/* =========================================================
-   FALLBACK SKILL METADATA
-========================================================= */
-
-const getSkillMeta = (skill: string): SkillMeta => {
+export default function HomePage() {
   return (
-    SKILL_INTELLIGENCE[skill] || {
-      importance: 75,
-      demand: 75,
-      difficulty: 65,
-      learningTime: "4–8 weeks",
-      category: "Emerging Capability",
-      description:
-        "Capability identified by the OmniNexus career graph.",
-      prerequisites: [],
-      nextSkills: [],
-    }
-  );
-};
+    <main className="min-h-screen overflow-x-hidden bg-[#030910] text-white">
 
-/* =========================================================
-   MAIN DASHBOARD
-========================================================= */
+      {/* Ambient background */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute left-[10%] top-[5%] h-[420px] w-[420px] rounded-full bg-cyan-500/[0.06] blur-[130px]" />
+        <div className="absolute right-[5%] top-[20%] h-[500px] w-[500px] rounded-full bg-indigo-500/[0.05] blur-[150px]" />
+        <div className="absolute bottom-0 left-[40%] h-[400px] w-[400px] rounded-full bg-violet-500/[0.04] blur-[140px]" />
+      </div>
 
-export default function OmniNexusDashboard() {
-  /* =======================================================
-     REACT FLOW
-  ======================================================= */
+      <div className="relative mx-auto max-w-[1450px] px-5 pb-32 pt-6 sm:px-8 lg:px-10">
 
-  const [nodes, setNodes, onNodesChange] =
-    useNodesState<Node>([]);
+        {/* =========================================================
+            TOP SYSTEM HEADER
+        ========================================================== */}
 
-  const [edges, setEdges, onEdgesChange] =
-    useEdgesState<Edge>([]);
+        <header className="mb-8 flex flex-col gap-5 rounded-2xl border border-slate-800/80 bg-[#07121e]/80 p-4 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
 
-  /* =======================================================
-     CAREER STATE
-  ======================================================= */
+          <div className="flex items-center gap-4">
 
-  const [readiness, setReadiness] = useState(0);
-
-  const [bottleneck, setBottleneck] =
-    useState("Analyzing...");
-
-  const [marketValue, setMarketValue] =
-    useState(0);
-
-  const [targetRole, setTargetRole] =
-    useState("AI Engineer");
-
-  const [currentSkills, setCurrentSkills] =
-    useState<string[]>(["Python"]);
-
-  /* =======================================================
-     RESUME STATE
-  ======================================================= */
-
-  const [resumeText, setResumeText] =
-    useState("");
-
-  const [isParsing, setIsParsing] =
-    useState(false);
-
-  const [parseMessage, setParseMessage] =
-    useState("");
-
-  const [parseError, setParseError] =
-    useState("");
-
-  /* =======================================================
-     API STATE
-  ======================================================= */
-
-  const [isAnalyzing, setIsAnalyzing] =
-    useState(false);
-
-  const [apiStatus, setApiStatus] =
-    useState<ApiStatus>("checking");
-
-  /* =======================================================
-     INTELLIGENCE PANEL
-  ======================================================= */
-
-  const [selectedSkill, setSelectedSkill] =
-    useState<string | null>(null);
-
-  const [showIntelligence, setShowIntelligence] =
-    useState(false);
-
-  const [activeSection, setActiveSection] =
-    useState("Career Simulator");
-
-  /* =======================================================
-     AVAILABLE SKILLS
-  ======================================================= */
-
-  const availableSkills = [
-    "Machine Learning",
-    "Deep Learning",
-    "PyTorch",
-    "LLMs",
-    "RAG",
-    "AI Agents",
-    "Cloud Computing",
-    "AWS",
-    "Docker",
-    "Kubernetes",
-    "MLOps",
-    "CI/CD",
-    "SQL",
-    "Data Analysis",
-  ];
-
-  /* =======================================================
-     DERIVED DATA
-  ======================================================= */
-
-  const missingSkills = useMemo(() => {
-    return availableSkills.filter(
-      (skill) => !currentSkills.includes(skill)
-    );
-  }, [currentSkills]);
-
-  const acquiredPercentage = useMemo(() => {
-    if (availableSkills.length === 0) return 0;
-
-    return Math.round(
-      (currentSkills.filter((skill) =>
-        availableSkills.includes(skill)
-      ).length /
-        availableSkills.length) *
-      100
-    );
-  }, [currentSkills, availableSkills.length]);
-
-  const selectedSkillMeta = selectedSkill
-    ? getSkillMeta(selectedSkill)
-    : null;
-
-  /* =======================================================
-     BACKEND HEALTH CHECK
-  ======================================================= */
-
-  const checkBackend = useCallback(async () => {
-    try {
-      setApiStatus("checking");
-
-      const response = await fetch(
-        `${API_URL}/api/v1/health`,
-        {
-          method: "GET",
-          cache: "no-store",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Backend unavailable");
-      }
-
-      setApiStatus("online");
-    } catch {
-      setApiStatus("offline");
-    }
-  }, []);
-
-  /* =======================================================
-     CAREER GRAPH ANALYSIS
-  ======================================================= */
-
-  const fetchGraph = useCallback(async () => {
-    setIsAnalyzing(true);
-
-    try {
-      const response = await fetch(
-        `${API_URL}/api/v1/analyze`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            current_skills: currentSkills,
-            target_role: targetRole,
-          }),
-          cache: "no-store",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          `Analysis request failed: ${response.status}`
-        );
-      }
-
-      const data: AnalysisResponse =
-        await response.json();
-
-      if (data.status === "success") {
-        if (data.flow_nodes) {
-          setNodes(data.flow_nodes);
-        }
-
-        if (data.flow_edges) {
-          setEdges(data.flow_edges);
-        }
-
-        setReadiness(
-          Number(data.readiness_score ?? 0)
-        );
-
-        setBottleneck(
-          data.bottleneck_skill ||
-          "No bottleneck detected"
-        );
-
-        setMarketValue(
-          Number(data.market_value ?? 0)
-        );
-
-        setApiStatus("online");
-      } else {
-        console.error(
-          "Analysis API returned:",
-          data
-        );
-      }
-    } catch (error) {
-      console.error(
-        "OmniNexus analysis error:",
-        error
-      );
-
-      setApiStatus("offline");
-    } finally {
-      setIsAnalyzing(false);
-    }
-  }, [
-    currentSkills,
-    targetRole,
-    setNodes,
-    setEdges,
-  ]);
-
-  /* =======================================================
-     INITIAL BACKEND CHECK
-  ======================================================= */
-
-  useEffect(() => {
-    checkBackend();
-  }, [checkBackend]);
-
-  /* =======================================================
-     GRAPH RECALCULATION
-  ======================================================= */
-
-  useEffect(() => {
-    fetchGraph();
-  }, [fetchGraph]);
-
-  /* =======================================================
-     REACT FLOW CONNECTION
-  ======================================================= */
-
-  const onConnect = useCallback(
-    (connection: Connection) => {
-      setEdges((existingEdges) =>
-        addEdge(connection, existingEdges)
-      );
-    },
-    [setEdges]
-  );
-
-  /* =======================================================
-     NODE CLICK
-  ======================================================= */
-
-  const onNodeClick: NodeMouseHandler = useCallback(
-    (_event, node) => {
-      const nodeLabel =
-        typeof node.data?.label === "string"
-          ? node.data.label
-          : "";
-
-      if (!nodeLabel) return;
-
-      const cleanLabel = nodeLabel
-        .replace(/^CURRENT:\s*/i, "")
-        .replace(/^TARGET:\s*/i, "")
-        .replace(/^GAP:\s*/i, "")
-        .trim();
-
-      setSelectedSkill(cleanLabel);
-      setShowIntelligence(true);
-    },
-    []
-  );
-
-  /* =======================================================
-     DIGITAL TALENT TWIN
-  ======================================================= */
-
-  const parseResume = async () => {
-    const cleanedResume = resumeText.trim();
-
-    if (!cleanedResume) {
-      setParseError(
-        "Please paste your resume text first."
-      );
-
-      setParseMessage("");
-      return;
-    }
-
-    setIsParsing(true);
-    setParseError("");
-    setParseMessage("");
-
-    try {
-      const response = await fetch(
-        `${API_URL}/api/v1/parse-resume`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            resume_text: cleanedResume,
-          }),
-          cache: "no-store",
-        }
-      );
-
-      const data: ParseResumeResponse =
-        await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.message ||
-          `Resume parsing failed: ${response.status}`
-        );
-      }
-
-      if (
-        data.status === "success" &&
-        Array.isArray(data.extracted_skills)
-      ) {
-        const extractedSkills =
-          data.extracted_skills;
-
-        setCurrentSkills((previousSkills) =>
-          Array.from(
-            new Set([
-              ...previousSkills,
-              ...extractedSkills,
-            ])
-          )
-        );
-
-        setParseMessage(
-          extractedSkills.length > 0
-            ? `Talent Twin synced — ${extractedSkills.length} skill${extractedSkills.length === 1
-              ? ""
-              : "s"
-            } detected.`
-            : "Resume processed, but no supported skills were detected."
-        );
-
-        setResumeText("");
-        setApiStatus("online");
-      } else {
-        setParseMessage(
-          data.message ||
-          "Resume processed, but no skills were returned."
-        );
-      }
-    } catch (error) {
-      console.error(
-        "Digital Talent Twin error:",
-        error
-      );
-
-      setParseError(
-        error instanceof Error
-          ? error.message
-          : "Unable to connect to the resume parser."
-      );
-    } finally {
-      setIsParsing(false);
-    }
-  };
-
-  /* =======================================================
-     ACQUIRE SKILL
-  ======================================================= */
-
-  const acquireSkill = (skill: string) => {
-    if (currentSkills.includes(skill)) return;
-
-    setCurrentSkills((previousSkills) => [
-      ...previousSkills,
-      skill,
-    ]);
-  };
-
-  /* =======================================================
-     INSPECT SKILL
-  ======================================================= */
-
-  const inspectSkill = (skill: string) => {
-    setSelectedSkill(skill);
-    setShowIntelligence(true);
-  };
-
-  /* =======================================================
-     RESET
-  ======================================================= */
-
-  const resetTimeline = () => {
-    setCurrentSkills(["Python"]);
-    setParseMessage("");
-    setParseError("");
-    setResumeText("");
-    setSelectedSkill(null);
-    setShowIntelligence(false);
-  };
-
-  /* =======================================================
-     FORMAT MONEY
-  ======================================================= */
-
-  const formattedMarketValue =
-    marketValue > 0
-      ? `$${(marketValue / 1000).toFixed(1)}k`
-      : "$0.0k";
-
-  /* =======================================================
-     RENDER
-  ======================================================= */
-
-  return (
-    <div className="h-screen w-full bg-[#05070d] text-slate-200 font-sans flex overflow-hidden">
-
-      {/* ===================================================
-          SIDEBAR
-      =================================================== */}
-
-      <aside className="w-[350px] min-w-[350px] bg-[#0b1120] border-r border-slate-800/80 flex flex-col z-20 shadow-2xl">
-
-        {/* SIDEBAR SCROLL AREA */}
-
-        <div className="flex-1 overflow-y-auto p-6">
-
-          {/* BRAND */}
-
-          <div className="mb-7">
-
-            <div className="flex items-center gap-3">
-
-              <div className="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center shadow-[0_0_25px_rgba(99,102,241,0.15)]">
-                <span className="text-indigo-400 font-black">
-                  N
-                </span>
-              </div>
-
-              <div>
-                <h1 className="text-2xl font-black tracking-wider text-indigo-400">
-                  OMNINEXUS
-                </h1>
-
-                <p className="text-[9px] text-slate-500 uppercase tracking-[0.25em]">
-                  Workforce OS
-                </p>
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* BACKEND STATUS */}
-
-          <div className="mb-6 p-3 rounded-xl bg-slate-950/60 border border-slate-800">
-
-            <div className="flex items-center justify-between">
-
-              <div className="flex items-center gap-2">
-
-                <span
-                  className={`w-2 h-2 rounded-full ${apiStatus === "online"
-                    ? "bg-emerald-400 animate-pulse"
-                    : apiStatus === "offline"
-                      ? "bg-red-400"
-                      : "bg-amber-400 animate-pulse"
-                    }`}
-                />
-
-                <span className="text-[9px] uppercase tracking-widest text-slate-400">
-                  {apiStatus === "online"
-                    ? "Backend Online"
-                    : apiStatus === "offline"
-                      ? "Backend Offline"
-                      : "Checking Backend"}
-                </span>
-
-              </div>
-
-              <span className="text-[9px] text-slate-600 font-mono">
-                :8001
-              </span>
-
-            </div>
-
-            <div className="mt-2 flex justify-between text-[8px] text-slate-600 font-mono">
-              <span>FASTAPI</span>
-              <span>
-                {apiStatus === "online"
-                  ? "CONNECTED"
-                  : "STANDBY"}
-              </span>
-            </div>
-
-          </div>
-
-          {/* TARGET ROLE */}
-
-          <div className="mb-6">
-
-            <label className="text-[10px] text-slate-400 uppercase tracking-wider font-bold mb-2 block">
-              Target Career Path
-            </label>
-
-            <select
-              value={targetRole}
-              onChange={(event) =>
-                setTargetRole(event.target.value)
-              }
-              className="w-full bg-slate-950 border border-slate-700 text-indigo-300 text-sm rounded-xl p-3 focus:border-indigo-500 outline-none font-semibold shadow-inner"
-            >
-              <option value="AI Engineer">
-                AI Engineer
-              </option>
-
-              <option value="Data Scientist">
-                Data Scientist
-              </option>
-
-              <option value="MLOps Engineer">
-                MLOps Engineer
-              </option>
-            </select>
-
-          </div>
-
-          {/* READINESS CARD */}
-
-          <div className="mb-6 rounded-2xl border border-indigo-900/50 bg-indigo-950/20 p-4">
-
-            <div className="flex items-center justify-between mb-2">
-
-              <span className="text-[10px] uppercase tracking-widest text-indigo-300 font-bold">
-                Career Readiness
-              </span>
-
-              <span className="text-xs text-slate-500 font-mono">
-                {readiness}/100
-              </span>
-
-            </div>
-
-            <div className="text-4xl font-black text-emerald-400 mb-3">
-              {readiness}%
-            </div>
-
-            <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
-
-              <div
-                className="h-full rounded-full bg-emerald-400 transition-all duration-700"
-                style={{
-                  width: `${Math.min(
-                    100,
-                    Math.max(0, readiness)
-                  )}%`,
-                }}
+            <div className="relative flex h-12 w-12 items-center justify-center rounded-xl border border-cyan-400/20 bg-cyan-400/[0.06]">
+              <BriefcaseBusiness
+                size={22}
+                className="text-cyan-400"
               />
 
+              <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]" />
             </div>
 
-            <div className="flex justify-between mt-2 text-[8px] text-slate-500 uppercase">
-              <span>Current</span>
-              <span>Target</span>
-            </div>
-
-          </div>
-
-          {/* METRICS */}
-
-          <div className="grid grid-cols-2 gap-3 mb-6">
-
-            <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 shadow-inner">
-
-              <p className="text-[9px] text-slate-500 uppercase tracking-wider mb-1">
-                Alignment
-              </p>
-
-              <p className="text-2xl font-mono font-bold text-emerald-400">
-                {readiness}%
-              </p>
-
-            </div>
-
-            <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 shadow-inner">
-
-              <p className="text-[9px] text-slate-500 uppercase tracking-wider mb-1">
-                Market Comp
-              </p>
-
-              <p className="text-xl font-mono font-bold text-amber-400">
-                {formattedMarketValue}
-              </p>
-
-            </div>
-
-          </div>
-
-          {/* BOTTLENECK */}
-
-          <button
-            onClick={() =>
-              bottleneck &&
-              inspectSkill(bottleneck)
-            }
-            className="w-full text-left p-4 bg-indigo-950/30 hover:bg-indigo-950/50 rounded-xl border border-indigo-900/50 mb-6 shadow-inner transition-all"
-          >
-
-            <p className="text-[9px] text-indigo-400/80 uppercase tracking-wider mb-1">
-              Graph Bottleneck
-            </p>
-
-            <p className="text-sm font-semibold text-indigo-200">
-              {bottleneck}
-            </p>
-
-            <p className="text-[8px] text-slate-500 mt-2">
-              Click to inspect capability intelligence
-            </p>
-
-          </button>
-
-          {/* DIGITAL TALENT TWIN */}
-
-          <div className="mb-6">
-
-            <div className="flex items-center justify-between mb-2">
-
-              <label className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">
-                Digital Talent Twin
-              </label>
-
-              <span className="text-[8px] text-indigo-400 font-mono">
-                AI PROFILE
-              </span>
-
-            </div>
-
-            <textarea
-              value={resumeText}
-              onChange={(event) =>
-                setResumeText(event.target.value)
-              }
-              placeholder="Paste resume text... e.g. 'I know Python, SQL, AWS, Pandas and Machine Learning'"
-              className="w-full h-32 bg-slate-800/80 border border-slate-700 rounded-xl p-3 text-xs text-slate-300 focus:outline-none focus:border-indigo-500 resize-none mb-2 shadow-inner"
-            />
-
-            <button
-              onClick={parseResume}
-              disabled={
-                isParsing ||
-                !resumeText.trim()
-              }
-              className={`w-full py-3 rounded-xl text-xs font-bold transition-all ${isParsing ||
-                !resumeText.trim()
-                ? "bg-slate-700 text-slate-500 cursor-not-allowed"
-                : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.25)]"
-                }`}
-            >
-              {isParsing
-                ? "Analyzing Talent Profile..."
-                : "Sync Digital Talent Twin"}
-            </button>
-
-            {parseMessage && (
-              <div className="mt-2 rounded-lg border border-emerald-900/50 bg-emerald-950/30 px-3 py-2">
-                <p className="text-[10px] text-emerald-400">
-                  ✓ {parseMessage}
-                </p>
-              </div>
-            )}
-
-            {parseError && (
-              <div className="mt-2 rounded-lg border border-red-900/50 bg-red-950/30 px-3 py-2">
-                <p className="text-[10px] text-red-400">
-                  ✕ {parseError}
-                </p>
-              </div>
-            )}
-
-          </div>
-
-          {/* CAPABILITY COVERAGE */}
-
-          <div className="mb-6">
-
-            <div className="flex items-center justify-between mb-2">
-
-              <p className="text-[10px] text-slate-500 uppercase tracking-wider">
-                Capability Coverage
-              </p>
-
-              <span className="text-[10px] text-indigo-400 font-mono">
-                {acquiredPercentage}%
-              </span>
-
-            </div>
-
-            <div className="h-1.5 rounded-full bg-slate-800 overflow-hidden mb-3">
-
-              <div
-                className="h-full bg-indigo-500 transition-all duration-700"
-                style={{
-                  width: `${acquiredPercentage}%`,
-                }}
-              />
-
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-
-              <div className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-900/40">
-
-                <p className="text-lg font-bold text-emerald-400">
-                  {currentSkills.length}
-                </p>
-
-                <p className="text-[8px] uppercase text-slate-500">
-                  Acquired
-                </p>
-
+            <div>
+              <div className="text-sm font-bold tracking-wide">
+                OmniNexus OS
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-
-                <p className="text-lg font-bold text-slate-300">
-                  {missingSkills.length}
-                </p>
-
-                <p className="text-[8px] uppercase text-slate-500">
-                  Remaining
-                </p>
-
+              <div className="text-xs text-slate-500">
+                Workforce Intelligence Command Center
               </div>
-
             </div>
 
           </div>
 
-          {/* CURRENT SKILLS */}
+          <div className="flex items-center gap-3">
 
-          <div>
-
-            <div className="flex items-center justify-between mb-2">
-
-              <p className="text-[10px] text-slate-500 uppercase tracking-wider">
-                Detected Capabilities
-              </p>
-
-              <span className="text-[10px] text-indigo-400 font-mono">
-                {currentSkills.length}
-              </span>
-
+            <div className="flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] px-4 py-2.5 text-xs font-semibold text-emerald-400">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
+              SYSTEM ONLINE
             </div>
 
-            <div className="flex flex-wrap gap-1.5">
-
-              {currentSkills.map((skill) => (
-                <button
-                  key={skill}
-                  onClick={() =>
-                    inspectSkill(skill)
-                  }
-                  className="px-2 py-1 rounded-md bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-900/50 text-[9px] text-emerald-400 font-semibold transition-all"
-                >
-                  ✓ {skill}
-                </button>
-              ))}
-
+            <div className="hidden rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-2.5 text-xs text-slate-400 sm:block">
+              LIVE GRAPH / AI ENGINE
             </div>
 
           </div>
+        </header>
 
-        </div>
 
-        {/* RESET */}
+        {/* =========================================================
+            HERO
+        ========================================================== */}
 
-        <div className="p-4 border-t border-slate-800 bg-[#0b1120]">
+        <section className="relative overflow-hidden rounded-[28px] border border-slate-800/90 bg-[#06111d]/90 p-7 shadow-2xl backdrop-blur-xl sm:p-10 lg:p-12">
 
-          <button
-            onClick={resetTimeline}
-            className="w-full py-2.5 bg-rose-950/40 hover:bg-rose-900/60 text-rose-400 border border-rose-900/50 rounded-xl transition-colors text-[10px] uppercase tracking-wider font-bold"
-          >
-            Reset Career Timeline
-          </button>
-
-        </div>
-
-      </aside>
-
-      {/* ===================================================
-          MAIN CANVAS
-      =================================================== */}
-
-      <main className="flex-1 relative bg-[#05070d]">
-
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onNodeClick={onNodeClick}
-          fitView
-          colorMode="dark"
-        >
-
-          {/* BACKGROUND */}
-
-          <Background
-            color="#172033"
-            gap={22}
-            size={1}
+          {/* Decorative grid */}
+          <div
+            className="pointer-events-none absolute inset-0 opacity-[0.13]"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(34,211,238,.15) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,.15) 1px, transparent 1px)",
+              backgroundSize: "44px 44px",
+            }}
           />
 
-          {/* CONTROLS */}
+          <div className="pointer-events-none absolute right-[-100px] top-[-100px] h-[350px] w-[350px] rounded-full border border-cyan-500/10" />
+          <div className="pointer-events-none absolute right-[-40px] top-[-40px] h-[230px] w-[230px] rounded-full border border-cyan-500/10" />
 
-          <Controls className="bg-slate-900 border-slate-700 fill-slate-300" />
+          <div className="relative grid gap-12 lg:grid-cols-[1.4fr_0.8fr] lg:items-center">
 
-          {/* =================================================
-              TOP RIGHT STATUS
-          ================================================= */}
+            <div>
 
-          <Panel
-            position="top-right"
-            className="bg-slate-900/90 p-3 rounded-xl border border-slate-800 backdrop-blur-xl m-4 flex flex-col gap-2 pointer-events-none shadow-2xl"
-          >
+              <div className="mb-5 flex flex-wrap items-center gap-3">
 
-            <div className="text-[9px] font-mono text-slate-400 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Live Math Routing
-            </div>
+                <span className="rounded-full border border-cyan-500/20 bg-cyan-500/[0.06] px-3 py-1.5 text-[10px] font-bold tracking-[0.22em] text-cyan-400">
+                  OMNINEXUS COMMAND CENTER
+                </span>
 
-            <div className="text-[9px] font-mono text-slate-400 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-              Market Intelligence
-            </div>
-
-            <div className="text-[9px] font-mono text-slate-400 flex items-center gap-2">
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${apiStatus === "online"
-                  ? "bg-emerald-500"
-                  : apiStatus === "offline"
-                    ? "bg-red-500"
-                    : "bg-amber-500"
-                  }`}
-              />
-              FastAPI{" "}
-              {apiStatus === "online"
-                ? "Connected"
-                : apiStatus === "offline"
-                  ? "Disconnected"
-                  : "Checking"}
-            </div>
-
-          </Panel>
-
-          {/* =================================================
-              TOP SKILL SIMULATOR
-          ================================================= */}
-
-          <Panel
-            position="top-left"
-            className="m-4 mr-6 w-[calc(100%-15rem)] max-w-[1050px] bg-slate-900/90 backdrop-blur-xl border border-slate-700/80 rounded-2xl p-5 shadow-2xl pointer-events-auto"
-          >
-
-            <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
-
-              <div>
-
-                <p className="text-[10px] text-indigo-300 uppercase tracking-[0.2em] font-bold">
-                  Simulate Upskilling Trajectory
-                </p>
-
-                <p className="text-[9px] text-slate-600 mt-1">
-                  Acquire capabilities and observe the career graph recalculate in real time.
-                </p>
+                <span className="rounded-full border border-emerald-500/20 bg-emerald-500/[0.05] px-3 py-1.5 text-[10px] font-semibold text-emerald-400">
+                  INTELLIGENCE STREAM ACTIVE
+                </span>
 
               </div>
+
+              <h1 className="max-w-4xl text-4xl font-black leading-[0.98] tracking-[-0.04em] sm:text-5xl lg:text-7xl">
+                Workforce intelligence,
+                <span className="block text-cyan-400">
+                  in one operating system.
+                </span>
+              </h1>
+
+              <p className="mt-6 max-w-2xl text-base leading-7 text-slate-400 sm:text-lg">
+                OmniNexus connects career simulation, talent intelligence,
+                workforce forecasting and graph-based capabilities into a
+                single operational intelligence layer.
+              </p>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+
+                <Link
+                  href="/career-simulator"
+                  className="group flex items-center gap-2 rounded-xl bg-cyan-400 px-5 py-3 text-sm font-bold text-[#03111c] transition-all hover:bg-cyan-300 hover:shadow-[0_0_30px_rgba(34,211,238,0.2)]"
+                >
+                  Launch Career Simulator
+                  <ArrowUpRight
+                    size={16}
+                    className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  />
+                </Link>
+
+                <Link
+                  href="/observatory"
+                  className="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900/70 px-5 py-3 text-sm font-semibold text-slate-300 transition-all hover:border-cyan-500/30 hover:bg-slate-800 hover:text-white"
+                >
+                  Open Observatory
+                  <Radar size={16} />
+                </Link>
+
+              </div>
+
+            </div>
+
+
+            {/* Command status visual */}
+
+            <div className="relative">
+
+              <div className="rounded-2xl border border-slate-800 bg-[#040c15]/80 p-5">
+
+                <div className="mb-5 flex items-center justify-between">
+                  <div>
+                    <div className="text-xs font-bold tracking-widest text-slate-500">
+                      SYSTEM TELEMETRY
+                    </div>
+
+                    <div className="mt-1 text-sm font-semibold text-white">
+                      Intelligence Core
+                    </div>
+                  </div>
+
+                  <Activity
+                    size={20}
+                    className="text-cyan-400"
+                  />
+                </div>
+
+
+                <div className="space-y-4">
+
+                  <TelemetryRow
+                    label="Graph Intelligence"
+                    value="99.98%"
+                    width="99.98%"
+                  />
+
+                  <TelemetryRow
+                    label="Market Feed"
+                    value="98.7%"
+                    width="98.7%"
+                  />
+
+                  <TelemetryRow
+                    label="Prediction Engine"
+                    value="99.2%"
+                    width="99.2%"
+                  />
+
+                  <TelemetryRow
+                    label="System Sync"
+                    value="100%"
+                    width="100%"
+                  />
+
+                </div>
+
+                <div className="mt-6 flex items-center justify-between border-t border-slate-800 pt-4">
+
+                  <span className="text-[10px] font-semibold tracking-widest text-slate-600">
+                    NODE NETWORK
+                  </span>
+
+                  <span className="text-sm font-black text-indigo-400">
+                    840K+
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+
+        {/* =========================================================
+            LIVE METRICS
+        ========================================================== */}
+
+        <section className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+
+          <MetricCard
+            icon={Gauge}
+            label="Graph Health"
+            value="99.98%"
+            change="+0.4%"
+          />
+
+          <MetricCard
+            icon={TrendingUp}
+            label="AI Demand"
+            value="+8.2%"
+            change="30D"
+          />
+
+          <MetricCard
+            icon={Users}
+            label="Talent Supply"
+            value="+3.4%"
+            change="LIVE"
+          />
+
+          <MetricCard
+            icon={Target}
+            label="Market Signal"
+            value="+6.1%"
+            change="ACTIVE"
+          />
+
+        </section>
+
+
+        {/* =========================================================
+            MODULES
+        ========================================================== */}
+
+        <section className="mt-12">
+
+          <div className="mb-6 flex items-end justify-between">
+
+            <div>
+              <div className="text-[10px] font-bold tracking-[0.25em] text-cyan-400">
+                INTELLIGENCE MODULES
+              </div>
+
+              <h2 className="mt-2 text-2xl font-black tracking-tight sm:text-3xl">
+                Your operating surface
+              </h2>
+
+              <p className="mt-2 text-sm text-slate-500">
+                Four connected intelligence environments.
+              </p>
+            </div>
+
+            <div className="hidden items-center gap-2 text-xs text-slate-500 sm:flex">
+              <Zap size={14} className="text-cyan-400" />
+              Unified navigation
+            </div>
+
+          </div>
+
+
+          <div className="grid gap-4 md:grid-cols-2">
+
+            {modules.map((module) => (
+              <ModuleCard
+                key={module.href}
+                {...module}
+              />
+            ))}
+
+          </div>
+
+        </section>
+
+
+        {/* =========================================================
+            SYSTEM SIGNALS
+        ========================================================== */}
+
+        <section className="mt-12">
+
+          <div className="mb-6">
+
+            <div className="text-[10px] font-bold tracking-[0.25em] text-indigo-400">
+              SYSTEM HEALTH
+            </div>
+
+            <h2 className="mt-2 text-2xl font-black">
+              Intelligence infrastructure
+            </h2>
+
+          </div>
+
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+
+            {systemSignals.map((signal) => {
+              const Icon = signal.icon;
+
+              return (
+                <div
+                  key={signal.name}
+                  className="rounded-2xl border border-slate-800 bg-[#07121e]/80 p-5 transition-all hover:border-slate-700 hover:bg-[#091725]"
+                >
+
+                  <div className="flex items-center justify-between">
+
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-800 bg-slate-900 text-cyan-400">
+                      <Icon size={17} />
+                    </div>
+
+                    <span className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-400">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                      {signal.status}
+                    </span>
+
+                  </div>
+
+                  <div className="mt-5 text-sm font-semibold text-slate-300">
+                    {signal.name}
+                  </div>
+
+                  <div className="mt-1 text-2xl font-black text-white">
+                    {signal.value}
+                  </div>
+
+                  <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-slate-800">
+                    <div
+                      className="h-full rounded-full bg-emerald-400"
+                      style={{ width: signal.value }}
+                    />
+                  </div>
+
+                </div>
+              );
+            })}
+
+          </div>
+
+        </section>
+
+
+        {/* =========================================================
+            GRAPH INTELLIGENCE
+        ========================================================== */}
+
+        <section className="mt-12 overflow-hidden rounded-2xl border border-slate-800 bg-[#07121e]/80">
+
+          <div className="grid lg:grid-cols-[1fr_0.8fr]">
+
+            <div className="p-7 sm:p-9">
 
               <div className="flex items-center gap-3">
 
-                {isAnalyzing && (
-                  <span className="text-[9px] text-amber-400 font-mono animate-pulse">
-                    RE-CALCULATING
-                  </span>
-                )}
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">
+                  <BrainCircuit size={20} />
+                </div>
 
-                <span className="text-[9px] text-slate-500 font-mono">
-                  {currentSkills.length} ACTIVE CAPABILITIES
+                <div>
+                  <div className="text-[10px] font-bold tracking-[0.2em] text-indigo-400">
+                    KNOWLEDGE GRAPH
+                  </div>
+
+                  <div className="text-sm font-bold">
+                    OmniNexus Intelligence Graph
+                  </div>
+                </div>
+
+              </div>
+
+              <h3 className="mt-7 text-2xl font-black sm:text-3xl">
+                Connect skills.
+                <span className="text-indigo-400">
+                  {" "}Understand transitions.
                 </span>
-
-              </div>
-
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-
-              {availableSkills.map((skill) => {
-
-                const acquired =
-                  currentSkills.includes(skill);
-
-                return (
-                  <button
-                    key={skill}
-                    onClick={() => {
-                      if (acquired) {
-                        inspectSkill(skill);
-                      } else {
-                        acquireSkill(skill);
-                      }
-                    }}
-                    className={`px-3 py-2 rounded-full text-[10px] font-bold transition-all border ${acquired
-                      ? "bg-emerald-950/40 text-emerald-400 border-emerald-900/60 shadow-[0_0_12px_rgba(16,185,129,0.08)]"
-                      : "bg-slate-800 hover:bg-indigo-900/50 text-slate-300 border-slate-700 hover:border-indigo-500 hover:text-white"
-                      }`}
-                  >
-                    {acquired
-                      ? `✓ ${skill}`
-                      : `+ ${skill}`}
-                  </button>
-                );
-
-              })}
-
-            </div>
-
-          </Panel>
-
-          {/* =================================================
-              CENTER HUD
-          ================================================= */}
-
-          <Panel
-            position="bottom-left"
-            className="m-4 pointer-events-none"
-          >
-
-            <div className="bg-slate-900/80 border border-slate-800 backdrop-blur-xl rounded-xl px-4 py-3">
-
-              <div className="text-[8px] uppercase tracking-widest text-slate-600 mb-1">
-                Active Target
-              </div>
-
-              <div className="text-xs font-bold text-indigo-300">
-                {targetRole}
-              </div>
-
-              <div className="mt-2 text-[8px] text-slate-500">
-                Click any graph node for intelligence
-              </div>
-
-            </div>
-
-          </Panel>
-
-        </ReactFlow>
-
-        {/* =================================================
-            CAREER INTELLIGENCE OVERLAY
-        ================================================= */}
-
-        {showIntelligence &&
-          selectedSkill &&
-          selectedSkillMeta && (
-            <div className="absolute right-5 top-24 w-[360px] max-h-[calc(100vh-150px)] overflow-y-auto z-30">
-
-              <div className="rounded-2xl border border-indigo-500/30 bg-[#0b1120]/95 backdrop-blur-2xl shadow-[0_0_50px_rgba(79,70,229,0.15)]">
-
-                {/* HEADER */}
-
-                <div className="p-5 border-b border-slate-800">
-
-                  <div className="flex items-start justify-between">
-
-                    <div>
-
-                      <p className="text-[8px] uppercase tracking-[0.2em] text-indigo-400 mb-2">
-                        Skill Intelligence
-                      </p>
-
-                      <h2 className="text-xl font-black text-white">
-                        {selectedSkill}
-                      </h2>
-
-                      <p className="text-[9px] text-slate-500 mt-1">
-                        {selectedSkillMeta.category}
-                      </p>
-
-                    </div>
-
-                    <button
-                      onClick={() =>
-                        setShowIntelligence(false)
-                      }
-                      className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white"
-                    >
-                      ×
-                    </button>
-
-                  </div>
-
-                </div>
-
-                {/* SCORES */}
-
-                <div className="p-5 space-y-4">
-
-                  {/* IMPORTANCE */}
-
-                  <div>
-
-                    <div className="flex justify-between mb-1">
-
-                      <span className="text-[9px] uppercase tracking-wider text-slate-500">
-                        Career Importance
-                      </span>
-
-                      <span className="text-[10px] text-indigo-300 font-mono">
-                        {selectedSkillMeta.importance}%
-                      </span>
-
-                    </div>
-
-                    <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
-
-                      <div
-                        className="h-full bg-indigo-500 rounded-full"
-                        style={{
-                          width: `${selectedSkillMeta.importance}%`,
-                        }}
-                      />
-
-                    </div>
-
-                  </div>
-
-                  {/* DEMAND */}
-
-                  <div>
-
-                    <div className="flex justify-between mb-1">
-
-                      <span className="text-[9px] uppercase tracking-wider text-slate-500">
-                        Market Demand
-                      </span>
-
-                      <span className="text-[10px] text-amber-300 font-mono">
-                        {selectedSkillMeta.demand}%
-                      </span>
-
-                    </div>
-
-                    <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
-
-                      <div
-                        className="h-full bg-amber-400 rounded-full"
-                        style={{
-                          width: `${selectedSkillMeta.demand}%`,
-                        }}
-                      />
-
-                    </div>
-
-                  </div>
-
-                  {/* DIFFICULTY */}
-
-                  <div>
-
-                    <div className="flex justify-between mb-1">
-
-                      <span className="text-[9px] uppercase tracking-wider text-slate-500">
-                        Learning Difficulty
-                      </span>
-
-                      <span className="text-[10px] text-rose-300 font-mono">
-                        {selectedSkillMeta.difficulty}%
-                      </span>
-
-                    </div>
-
-                    <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
-
-                      <div
-                        className="h-full bg-rose-400 rounded-full"
-                        style={{
-                          width: `${selectedSkillMeta.difficulty}%`,
-                        }}
-                      />
-
-                    </div>
-
-                  </div>
-
-                  {/* DESCRIPTION */}
-
-                  <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800">
-
-                    <p className="text-[9px] uppercase tracking-wider text-indigo-400 mb-2">
-                      Capability Brief
-                    </p>
-
-                    <p className="text-xs leading-5 text-slate-300">
-                      {selectedSkillMeta.description}
-                    </p>
-
-                  </div>
-
-                  {/* LEARNING TIME */}
-
-                  <div className="grid grid-cols-2 gap-3">
-
-                    <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-
-                      <p className="text-[8px] uppercase text-slate-600">
-                        Estimated Learning
-                      </p>
-
-                      <p className="text-xs font-bold text-white mt-1">
-                        {selectedSkillMeta.learningTime}
-                      </p>
-
-                    </div>
-
-                    <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-
-                      <p className="text-[8px] uppercase text-slate-600">
-                        Current Status
-                      </p>
-
-                      <p
-                        className={`text-xs font-bold mt-1 ${currentSkills.includes(
-                          selectedSkill
-                        )
-                          ? "text-emerald-400"
-                          : "text-amber-400"
-                          }`}
-                      >
-                        {currentSkills.includes(
-                          selectedSkill
-                        )
-                          ? "ACQUIRED"
-                          : "GAP"}
-                      </p>
-
-                    </div>
-
-                  </div>
-
-                  {/* PREREQUISITES */}
-
-                  {selectedSkillMeta.prerequisites
-                    .length > 0 && (
-                      <div>
-
-                        <p className="text-[9px] uppercase tracking-wider text-slate-500 mb-2">
-                          Prerequisites
-                        </p>
-
-                        <div className="flex flex-wrap gap-1.5">
-
-                          {selectedSkillMeta.prerequisites.map(
-                            (skill) => {
-
-                              const hasSkill =
-                                currentSkills.includes(
-                                  skill
-                                );
-
-                              return (
-                                <button
-                                  key={skill}
-                                  onClick={() =>
-                                    inspectSkill(
-                                      skill
-                                    )
-                                  }
-                                  className={`px-2 py-1 rounded-md text-[9px] border ${hasSkill
-                                    ? "bg-emerald-950/30 border-emerald-900/50 text-emerald-400"
-                                    : "bg-amber-950/20 border-amber-900/50 text-amber-400"
-                                    }`}
-                                >
-                                  {hasSkill
-                                    ? "✓"
-                                    : "○"}{" "}
-                                  {skill}
-                                </button>
-                              );
-
-                            }
-                          )}
-
-                        </div>
-
-                      </div>
-                    )}
-
-                  {/* NEXT SKILLS */}
-
-                  {selectedSkillMeta.nextSkills
-                    .length > 0 && (
-                      <div>
-
-                        <p className="text-[9px] uppercase tracking-wider text-slate-500 mb-2">
-                          Recommended Next Capabilities
-                        </p>
-
-                        <div className="space-y-2">
-
-                          {selectedSkillMeta.nextSkills.map(
-                            (skill) => (
-                              <button
-                                key={skill}
-                                onClick={() =>
-                                  inspectSkill(skill)
-                                }
-                                className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-slate-800/70 hover:bg-indigo-900/30 border border-slate-700 hover:border-indigo-500/50 transition-all"
-                              >
-                                <span className="text-[10px] text-slate-300">
-                                  {skill}
-                                </span>
-
-                                <span className="text-indigo-400">
-                                  →
-                                </span>
-                              </button>
-                            )
-                          )}
-
-                        </div>
-
-                      </div>
-                    )}
-
-                  {/* ACTION */}
-
-                  {!currentSkills.includes(
-                    selectedSkill
-                  ) && (
-                      <button
-                        onClick={() => {
-                          acquireSkill(selectedSkill);
-                          setShowIntelligence(false);
-                        }}
-                        className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-[0_0_25px_rgba(99,102,241,0.2)] transition-all"
-                      >
-                        Acquire Capability
-                      </button>
-                    )}
-
-                </div>
-
-              </div>
-
-            </div>
-          )}
-
-        {/* =================================================
-            BOTTOM NAVIGATION
-        ================================================= */}
-
-        <div className="absolute bottom-4 left-4 right-4 z-20">
-
-          <div className="mx-auto max-w-[1100px] rounded-2xl border border-slate-700/80 bg-slate-900/90 backdrop-blur-xl shadow-2xl p-2 flex items-center">
-
-            {[
-              "Career Simulator",
-              "Talent Matcher",
-              "Observatory",
-              "System DB",
-            ].map((section) => (
-
-              <button
-                key={section}
-                onClick={() =>
-                  setActiveSection(section)
-                }
-                className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all ${activeSection === section
-                  ? "bg-indigo-600 text-white shadow-[0_0_20px_rgba(99,102,241,0.2)]"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800"
-                  }`}
+              </h3>
+
+              <p className="mt-4 max-w-xl text-sm leading-6 text-slate-500">
+                Skills, roles, candidates, market signals and career
+                transitions are represented as connected intelligence
+                inside the OmniNexus graph.
+              </p>
+
+              <Link
+                href="/database"
+                className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-cyan-400 hover:text-cyan-300"
               >
-                {section}
-              </button>
+                Explore System DB
+                <ArrowUpRight size={15} />
+              </Link>
 
-            ))}
+            </div>
 
-            <button
-              onClick={resetTimeline}
-              className="ml-2 px-5 py-3 rounded-xl text-xs font-bold text-rose-400 border border-rose-900/50 hover:bg-rose-950/40 transition-all"
-            >
-              Reset
-            </button>
 
-          </div>
+            {/* Graph visual */}
 
-        </div>
+            <div className="relative min-h-[280px] overflow-hidden border-t border-slate-800 bg-[#040b13] lg:border-l lg:border-t-0">
 
-        {/* =================================================
-            ACTIVE SECTION INDICATOR
-        ================================================= */}
+              <div
+                className="absolute inset-0 opacity-20"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(circle, rgba(34,211,238,.5) 1px, transparent 1px)",
+                  backgroundSize: "24px 24px",
+                }}
+              />
 
-        {activeSection !== "Career Simulator" && (
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none">
+              <div className="absolute left-[18%] top-[35%] h-3 w-3 rounded-full bg-cyan-400 shadow-[0_0_18px_rgba(34,211,238,.8)]" />
+              <div className="absolute left-[42%] top-[20%] h-3 w-3 rounded-full bg-indigo-400 shadow-[0_0_18px_rgba(129,140,248,.8)]" />
+              <div className="absolute left-[65%] top-[48%] h-3 w-3 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,.8)]" />
+              <div className="absolute left-[78%] top-[72%] h-3 w-3 rounded-full bg-violet-400 shadow-[0_0_18px_rgba(167,139,250,.8)]" />
+              <div className="absolute left-[48%] top-[68%] h-4 w-4 rounded-full bg-cyan-300 shadow-[0_0_24px_rgba(34,211,238,.9)]" />
 
-            <div className="rounded-2xl border border-indigo-500/20 bg-slate-900/80 backdrop-blur-xl px-8 py-5 text-center shadow-2xl">
+              <div className="absolute left-[20%] top-[37%] h-px w-[25%] rotate-[-20deg] bg-cyan-400/30" />
+              <div className="absolute left-[44%] top-[23%] h-px w-[24%] rotate-[28deg] bg-indigo-400/30" />
+              <div className="absolute left-[50%] top-[68%] h-px w-[30%] rotate-[-25deg] bg-cyan-400/30" />
+              <div className="absolute left-[66%] top-[51%] h-px w-[17%] rotate-[45deg] bg-emerald-400/30" />
 
-              <p className="text-[9px] uppercase tracking-[0.25em] text-indigo-400 mb-2">
-                OmniNexus Module
-              </p>
-
-              <h2 className="text-lg font-black text-white">
-                {activeSection}
-              </h2>
-
-              <p className="text-[9px] text-slate-500 mt-2">
-                Module ready for expansion
-              </p>
+              <div className="absolute bottom-5 left-5 rounded-lg border border-slate-800 bg-slate-950/80 px-3 py-2 text-[10px] font-semibold text-slate-500 backdrop-blur">
+                GRAPH NETWORK ACTIVE
+              </div>
 
             </div>
 
           </div>
-        )}
 
-      </main>
+        </section>
+
+
+        {/* =========================================================
+            FOOTER STATUS
+        ========================================================== */}
+
+        <footer className="mt-10 flex flex-col gap-3 border-t border-slate-900 pt-6 text-[10px] font-semibold tracking-widest text-slate-600 sm:flex-row sm:items-center sm:justify-between">
+
+          <span>
+            OMNINEXUS OS · WORKFORCE INTELLIGENCE
+          </span>
+
+          <span className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            ALL CORE SERVICES OPERATIONAL
+          </span>
+
+        </footer>
+
+      </div>
+    </main>
+  );
+}
+
+
+/* =========================================================
+   COMPONENTS
+========================================================= */
+
+function TelemetryRow({
+  label,
+  value,
+  width,
+}: {
+  label: string;
+  value: string;
+  width: string;
+}) {
+  return (
+    <div>
+
+      <div className="mb-2 flex items-center justify-between text-xs">
+
+        <span className="text-slate-500">
+          {label}
+        </span>
+
+        <span className="font-bold text-emerald-400">
+          {value}
+        </span>
+
+      </div>
+
+      <div className="h-1.5 overflow-hidden rounded-full bg-slate-800">
+
+        <div
+          className="h-full rounded-full bg-emerald-400"
+          style={{ width }}
+        />
+
+      </div>
 
     </div>
+  );
+}
+
+
+function MetricCard({
+  icon: Icon,
+  label,
+  value,
+  change,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string;
+  change: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-slate-800 bg-[#07121e]/80 p-4 transition-all hover:border-slate-700">
+
+      <div className="flex items-center justify-between">
+
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-500/[0.06] text-cyan-400">
+          <Icon size={17} />
+        </div>
+
+        <span className="rounded-md bg-emerald-500/[0.06] px-2 py-1 text-[9px] font-bold text-emerald-400">
+          {change}
+        </span>
+
+      </div>
+
+      <div className="mt-4 text-[10px] font-bold tracking-widest text-slate-600">
+        {label}
+      </div>
+
+      <div className="mt-1 text-xl font-black text-white sm:text-2xl">
+        {value}
+      </div>
+
+    </div>
+  );
+}
+
+
+function ModuleCard({
+  title,
+  description,
+  href,
+  icon: Icon,
+  metric,
+  metricLabel,
+  accent,
+}: {
+  title: string;
+  description: string;
+  href: string;
+  icon: React.ElementType;
+  metric: string;
+  metricLabel: string;
+  accent: "cyan" | "violet" | "emerald" | "amber";
+}) {
+  const accentClasses = {
+    cyan: {
+      icon: "text-cyan-400 bg-cyan-400/[0.06] border-cyan-500/20",
+      glow: "hover:border-cyan-500/30",
+      metric: "text-cyan-400",
+    },
+    violet: {
+      icon: "text-violet-400 bg-violet-400/[0.06] border-violet-500/20",
+      glow: "hover:border-violet-500/30",
+      metric: "text-violet-400",
+    },
+    emerald: {
+      icon: "text-emerald-400 bg-emerald-400/[0.06] border-emerald-500/20",
+      glow: "hover:border-emerald-500/30",
+      metric: "text-emerald-400",
+    },
+    amber: {
+      icon: "text-amber-400 bg-amber-400/[0.06] border-amber-500/20",
+      glow: "hover:border-amber-500/30",
+      metric: "text-amber-400",
+    },
+  };
+
+  const styles = accentClasses[accent];
+
+  return (
+    <Link
+      href={href}
+      className={`
+        group
+        rounded-2xl
+        border
+        border-slate-800
+        bg-[#07121e]/80
+        p-6
+        transition-all
+        duration-300
+        hover:-translate-y-0.5
+        hover:bg-[#091725]
+        ${styles.glow}
+      `}
+    >
+
+      <div className="flex items-start justify-between">
+
+        <div
+          className={`
+            flex
+            h-11
+            w-11
+            items-center
+            justify-center
+            rounded-xl
+            border
+            ${styles.icon}
+          `}
+        >
+          <Icon size={20} />
+        </div>
+
+        <ArrowUpRight
+          size={18}
+          className="text-slate-700 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-slate-300"
+        />
+
+      </div>
+
+      <div className="mt-6">
+
+        <h3 className="text-lg font-bold">
+          {title}
+        </h3>
+
+        <p className="mt-2 max-w-lg text-sm leading-6 text-slate-500">
+          {description}
+        </p>
+
+      </div>
+
+      <div className="mt-6 flex items-end justify-between border-t border-slate-800 pt-4">
+
+        <div>
+          <div className="text-[9px] font-bold tracking-widest text-slate-600">
+            {metricLabel}
+          </div>
+
+          <div className={`mt-1 text-xl font-black ${styles.metric}`}>
+            {metric}
+          </div>
+        </div>
+
+        <span className="text-[10px] font-semibold text-slate-600 transition-colors group-hover:text-slate-400">
+          OPEN MODULE →
+        </span>
+
+      </div>
+
+    </Link>
   );
 }

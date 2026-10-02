@@ -1,19 +1,18 @@
-﻿import type { Metadata } from 'next';
-import './globals.css';
-import FloatingNav from '../components/FloatingNav';
+﻿import "./globals.css";
 
-export const metadata: Metadata = {
-  title: 'OmniNexus OS',
-  description: 'Temporal Workforce Intelligence',
+export const metadata = {
+  title: "OmniNexus OS",
+  description: "Workforce Intelligence Operating System",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html lang="en">
-      <body className="bg-slate-950 text-slate-200 m-0 p-0">
-        {children}
-        <FloatingNav />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
