@@ -454,7 +454,7 @@ export default function RecruiterDashboard() {
     );
 
     const candidateA: Candidate = {
-      name: "Lubhanshu Saini",
+      name: "Candidate A",
       score: primaryScore,
       current: currentSkills,
       missing: missingSkills,
