@@ -46,7 +46,11 @@ import {
 } from "lucide-react";
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001";
+  process.env.NEXT_PUBLIC_API_URL ||
+  (typeof window !== "undefined" &&
+  !["localhost", "127.0.0.1"].includes(window.location.hostname)
+    ? "https://omninexus-api-prod.onrender.com"
+    : "http://localhost:8001");
 
 type ForecastRange = "7D" | "30D" | "90D" | "1Y";
 
