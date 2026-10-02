@@ -44,6 +44,9 @@ import {
   Zap,
 } from "lucide-react";
 
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001";
+
 type ForecastRange = "7D" | "30D" | "90D" | "1Y";
 
 type Skill = {
@@ -300,6 +303,9 @@ export default function Observatory() {
   >([]);
   const [compactMode, setCompactMode] = useState(false);
   const [lastUpdated, setLastUpdated] = useState("just now");
+  const [apiStatus, setApiStatus] = useState<"online" | "offline" | "checking">("checking");
+  const [apiLatency, setApiLatency] = useState<number | null>(null);
+  const [apiVersion, setApiVersion] = useState("—");
 
   const projectedDemand = useMemo(() => {
     return Math.round(5839 * (1 + scenario / 100));
@@ -314,14 +320,39 @@ export default function Observatory() {
     Math.round(((projectedDemand - projectedSupply) / projectedDemand) * 100)
   );
 
+  const checkSystem = async () => {
+    const started = performance.now();
+    try {
+      setApiStatus("checking");
+      const response = await fetch(`${API_BASE}/api/v1/system/status`, {
+        method: "GET",
+        cache: "no-store",
+      });
+      if (!response.ok) throw new Error("System status unavailable");
+      const data = await response.json();
+      setApiLatency(Math.round(performance.now() - started));
+      setApiVersion(String(data.version ?? "—"));
+      setApiStatus("online");
+      setLastUpdated("just now");
+    } catch {
+      setApiLatency(null);
+      setApiStatus("offline");
+    }
+  };
+
   const handleRefresh = () => {
     if (refreshing) return;
     setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-      setLastUpdated("just now");
-    }, 1100);
+    void checkSystem().finally(() => {
+      window.setTimeout(() => setRefreshing(false), 450);
+    });
   };
+
+  useEffect(() => {
+    void checkSystem();
+    const interval = window.setInterval(() => void checkSystem(), 30000);
+    return () => window.clearInterval(interval);
+  }, []);
 
   const scrollToSection = (id: string) => {
     document.getElementById(id)?.scrollIntoView({
@@ -618,12 +649,15 @@ export default function Observatory() {
         >
           {/* STATUS STRIP */}
           <div className="flex flex-wrap items-center gap-2">
-            <StatusPill tone="emerald">INTELLIGENCE ENGINE ACTIVE</StatusPill>
-            <StatusPill tone="cyan">LABOR MARKET LINKED</StatusPill>
-            <StatusPill tone="indigo">840K+ KNOWLEDGE NODES</StatusPill>
+            <StatusPill tone={apiStatus === "online" ? "emerald" : apiStatus === "offline" ? "rose" : "amber"}>
+              API {apiStatus === "online" ? "ONLINE" : apiStatus === "offline" ? "OFFLINE" : "CHECKING"}
+            </StatusPill>
+            <StatusPill tone="cyan">INTELLIGENCE ENGINE ACTIVE</StatusPill>
+            <StatusPill tone="indigo">MODEL {apiVersion}</StatusPill>
 
             <div className="ml-auto hidden text-[10px] font-bold uppercase tracking-widest text-slate-600 lg:block">
-              SNAPSHOT / 23 SEP 2026 / LIVE · UPDATED {lastUpdated.toUpperCase()}
+              SNAPSHOT / MODELED INTELLIGENCE · UPDATED {lastUpdated.toUpperCase()}
+              {apiLatency !== null ? ` · API ${apiLatency}MS` : ""}
             </div>
           </div>
 
