@@ -1,5 +1,6 @@
 ﻿import "./globals.css";
 import FloatingNav from "@/components/FloatingNav";
+import AuthGate from "@/components/AuthGate";
 
 export const metadata = {
   title: "OmniNexus OS",
@@ -20,7 +21,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body suppressHydrationWarning>{children}<FloatingNav /></body>
+      <body suppressHydrationWarning><AuthGate>{children}</AuthGate><FloatingNav /></body>
     </html>
   );
 }
