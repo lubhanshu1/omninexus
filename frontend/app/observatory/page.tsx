@@ -630,14 +630,14 @@ export default function Observatory() {
 
             <div className="flex items-center gap-2">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-indigo-500/30 bg-indigo-500/10 text-xs font-black text-indigo-300">
-                LS
+                NF
               </div>
               <div className="hidden sm:block">
                 <div className="text-xs font-bold text-white">
-                  Lubhanshu Saini
+                  NexusForge
                 </div>
                 <div className="text-[9px] text-slate-500">
-                  Intelligence Operator
+                  Team Workspace
                 </div>
               </div>
             </div>
