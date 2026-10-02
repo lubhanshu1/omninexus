@@ -500,7 +500,7 @@ export default function OmniNexusDashboard() {
 
   const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
   const [simulatedSkills, setSimulatedSkills] = useState<string[]>([]);
-  const [liveClock, setLiveClock] = useState(new Date());
+  const [liveClock, setLiveClock] = useState<Date | null>(null);
   const [artifactTick, setArtifactTick] = useState(0);
   const [showAllArtifacts, setShowAllArtifacts] = useState(false);
 
@@ -575,7 +575,9 @@ export default function OmniNexusDashboard() {
   }, [readiness, skillCoverage, artifactTick]);
 
   const systemArtifacts = useMemo(() => {
-    const now = liveClock.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    const now = liveClock
+      ? liveClock.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+      : "--:--:--";
     return [
       `${now}  graph.engine → ${nodes.length} nodes / ${edges.length} edges`,
       `${now}  career.model → readiness ${readiness}% / alignment ${skillCoverage}%`,
@@ -590,6 +592,7 @@ export default function OmniNexusDashboard() {
   ======================================================= */
 
   useEffect(() => {
+    setLiveClock(new Date());
     const timer = window.setInterval(() => {
       setLiveClock(new Date());
       setArtifactTick((v) => v + 1);
@@ -1139,7 +1142,7 @@ ${new Date().toLocaleString()}
               <span className="text-[9px] font-black uppercase tracking-wider text-slate-400">{apiStatus === "online" ? "API ONLINE" : apiStatus === "offline" ? "API OFFLINE" : "CHECKING"}</span>
               <span className="border-l border-slate-800 pl-2 font-mono text-[9px] text-slate-600">{latency !== null ? `${latency}ms` : "--"}</span>
             </div>
-            <div className="flex items-center gap-2 rounded-xl border border-emerald-500/15 bg-emerald-500/[0.04] px-3 py-2 font-mono text-[9px] text-emerald-400"><Clock3 size={12} /> {liveClock.toLocaleTimeString()}</div>
+            <div className="flex items-center gap-2 rounded-xl border border-emerald-500/15 bg-emerald-500/[0.04] px-3 py-2 font-mono text-[9px] text-emerald-400"><Clock3 size={12} /> {liveClock ? liveClock.toLocaleTimeString() : "--:--:--"}</div>
             <button onClick={() => { checkBackend(); fetchGraph(); }} disabled={isAnalyzing} className="flex items-center gap-2 rounded-xl border border-slate-800 bg-[#07111d] px-3 py-2 text-[9px] font-black uppercase tracking-wider text-slate-400 hover:border-cyan-500/30 hover:text-cyan-400 disabled:opacity-50"><RefreshCw size={13} className={isAnalyzing ? "animate-spin" : ""} /> Refresh Intelligence</button>
             <button onClick={exportReport} className="flex items-center gap-2 rounded-xl border border-cyan-500/20 bg-cyan-500/10 px-3 py-2 text-[9px] font-black uppercase tracking-wider text-cyan-400 hover:bg-cyan-500/15"><Download size={13} /> Export</button>
           </div>
