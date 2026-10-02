@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Activity,
   BriefcaseBusiness,
@@ -40,6 +40,19 @@ const navItems = [
 
 export default function FloatingNav() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    try {
+      window.sessionStorage.removeItem("omninexus_token");
+      window.localStorage.removeItem("omninexus_authenticated");
+      window.localStorage.removeItem("omninexus_user_email");
+      window.localStorage.removeItem("omninexus_login_time");
+    } finally {
+      router.push("/login");
+      router.refresh();
+    }
+  };
 
   // Hide global navigation on authentication page
   if (pathname === "/login") {
@@ -304,8 +317,9 @@ export default function FloatingNav() {
         {/* =========================================================
             LOGOUT
         ========================================================= */}
-        <Link
-          href="/login"
+        <button
+          type="button"
+          onClick={handleLogout}
           className="
             flex
             h-11
@@ -351,7 +365,7 @@ export default function FloatingNav() {
           <span className="hidden sm:inline">
             Logout
           </span>
-        </Link>
+        </button>
       </div>
     </nav>
   );
