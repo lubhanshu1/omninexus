@@ -13,7 +13,7 @@ def test_health_check():
 
 def test_signup_and_login_flow():
     signup = client.post('/api/v1/auth/signup', json={'email': 'phase1@example.com', 'password': 'StrongPass123!'})
-    assert signup.status_code == 200
+    assert signup.status_code == 201
     assert signup.json()['status'] == 'success'
 
     login = client.post('/api/v1/auth/login', json={'email': 'phase1@example.com', 'password': 'StrongPass123!'})
