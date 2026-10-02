@@ -34,7 +34,7 @@ body {
   color: var(--foreground);
   font-family: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-  letter-spacing: -0.005em;
+  letter-spacing: -0.003em;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -364,4 +364,38 @@ html[data-theme="light"] ::-webkit-scrollbar-thumb {
 
 html[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
   background: #aebdcb;
+}
+
+
+/* =========================================================
+   OmniNexus typography refinement
+   Keep Inter, but give display headings a calmer premium
+   rhythm instead of an overly compressed/bold appearance.
+   ========================================================= */
+
+h1, h2, h3 {
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  letter-spacing: -0.028em;
+  text-wrap: balance;
+}
+
+h1 {
+  font-weight: 750;
+}
+
+h2 {
+  font-weight: 720;
+}
+
+h3 {
+  font-weight: 680;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  letter-spacing: -0.006em;
 }
