@@ -20,6 +20,8 @@ SKILL_GRAPH_NODES = {
     "AI Engineer": {"val": 0},
     "Data Scientist": {"val": 0},
     "MLOps Engineer": {"val": 0},
+    "AI Product Engineer": {"val": 0},
+    "Machine Learning Engineer": {"val": 0},
 }
 
 SKILL_GRAPH_EDGES = [
@@ -31,11 +33,14 @@ SKILL_GRAPH_EDGES = [
     ("Deep Learning", "PyTorch"),
     ("PyTorch", "MLOps"),
     ("MLOps", "AI Engineer"),
+    ("MLOps", "Machine Learning Engineer"),
     ("PyTorch", "LLMs"),
     ("LLMs", "RAG"),
     ("RAG", "AI Agents"),
     ("AI Agents", "AI Engineer"),
+    ("AI Agents", "AI Product Engineer"),
     ("Machine Learning", "Data Scientist"),
+    ("Data Analysis", "Data Scientist"),
     ("Python", "Cloud Computing"),
     ("Cloud Computing", "AWS"),
     ("AWS", "Docker"),
