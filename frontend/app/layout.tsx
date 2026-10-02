@@ -1,4 +1,5 @@
 ﻿import "./globals.css";
+import FloatingNav from "@/components/FloatingNav";
 
 export const metadata = {
   title: "OmniNexus OS",
@@ -12,7 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>{children}<FloatingNav /></body>
     </html>
   );
 }
