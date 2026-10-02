@@ -443,7 +443,7 @@ export default function RecruiterDashboard() {
    * CANDIDATE MODEL
    * ------------------------------------------------------------
    *
-   * Lubhanshu is generated from the actual current skill
+   * Candidate A is generated from the actual current skill
    * state instead of having a permanently hard-coded score.
    */
 
