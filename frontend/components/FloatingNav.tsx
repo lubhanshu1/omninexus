@@ -25,13 +25,13 @@ const navItems = [
     icon: Network,
   },
   {
-    name: "Workforce Observatory",
+    name: "Workforce",
     shortName: "Observatory",
     path: "/observatory",
     icon: Activity,
   },
   {
-    name: "System DB",
+    name: "Database",
     shortName: "System DB",
     path: "/database",
     icon: Database,
@@ -311,7 +311,7 @@ export default function FloatingNav() {
             "
           />
 
-          <span>SYSTEM ONLINE</span>
+          <span>API ONLINE</span>
         </div>
 
         {/* =========================================================
