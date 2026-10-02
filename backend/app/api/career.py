@@ -1,11 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-
-from app.database import get_db
+from fastapi import APIRouter, HTTPException, status
 from app.schemas.career import GraphRequest, ResumeRequest
 from app.services.career_engine import analyze_career_path
 from app.services.resume_service import extract_skills_from_resume
-from app.services.skill_graph import build_skill_graph
 
 router = APIRouter(prefix="/api/v1", tags=["career"])
 
@@ -22,7 +18,6 @@ def analyze_path(request: GraphRequest):
     if result.get("status") == "error":
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=result["message"])
 
-    graph = build_skill_graph()
     shortest_path = result["shortest_path"]
     flow_nodes, flow_edges = [], []
     x_pos = 50
