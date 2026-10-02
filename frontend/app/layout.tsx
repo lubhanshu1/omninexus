@@ -13,7 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}<FloatingNav /></body>
+      <body suppressHydrationWarning>{children}<FloatingNav /></body>
     </html>
   );
 }
