@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
+from app.models.user import User
+from app.core.security import get_current_user
 from app.schemas.career import GraphRequest, ResumeRequest
 from app.services.career_engine import analyze_career_path
 from app.services.resume_service import extract_skills_from_resume
@@ -7,13 +9,13 @@ router = APIRouter(prefix="/api/v1", tags=["career"])
 
 
 @router.post("/parse-resume", summary="Extract skills from resume text")
-def parse_resume(request: ResumeRequest):
+def parse_resume(request: ResumeRequest, current_user: User = Depends(get_current_user)):
     extracted_skills = extract_skills_from_resume(request.resume_text)
     return {"status": "success", "extracted_skills": extracted_skills}
 
 
 @router.post("/analyze", summary="Analyze a user's skill graph against a target role")
-def analyze_path(request: GraphRequest):
+def analyze_path(request: GraphRequest, current_user: User = Depends(get_current_user)):
     result = analyze_career_path(request.current_skills, request.target_role)
     if result.get("status") == "error":
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=result["message"])
@@ -26,11 +28,11 @@ def analyze_path(request: GraphRequest):
         is_current = node in request.current_skills
         is_target = node == request.target_role
         bg = "#10b981" if is_current else "#6366f1" if is_target else "#3b82f6"
-        status = "CURRENT" if is_current else "TARGET" if is_target else "GAP"
+        node_status = "CURRENT" if is_current else "TARGET" if is_target else "GAP"
         flow_nodes.append({
             "id": node,
             "position": {"x": x_pos + (idx * 260), "y": 250 + (idx % 2 * 80 - 40)},
-            "data": {"label": f"{status}: {node}"},
+            "data": {"label": f"{node_status}: {node}"},
             "style": {
                 "background": bg,
                 "color": "white",
