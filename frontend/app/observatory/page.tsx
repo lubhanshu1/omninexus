@@ -2267,6 +2267,14 @@ function SidebarLinks({
             <GitBranch size={16} />
             Career Simulator
           </Link>
+
+          <Link
+            href="/future-lab"
+            className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-slate-500 transition hover:bg-slate-800/50 hover:text-white"
+          >
+            <Sparkles size={16} />
+            Future Shock Lab
+          </Link>
         </nav>
       </div>
 
