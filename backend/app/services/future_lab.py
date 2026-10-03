@@ -2,10 +2,10 @@ from app.schemas.future_lab import FutureLabRequest
 
 ROLE_PROFILES = {
     "AI Engineer": {"readiness": 22, "market": 14.2, "critical": ["Machine Learning", "LLMs", "RAG", "MLOps"]},
-    "ML Engineer": {"readiness": 26, "market": 13.6, "critical": ["Machine Learning", "Deep Learning", "PyTorch", "MLOps"]},
+    "Machine Learning Engineer": {"readiness": 26, "market": 13.6, "critical": ["Machine Learning", "Deep Learning", "PyTorch", "MLOps"]},
     "Data Scientist": {"readiness": 34, "market": 11.8, "critical": ["Statistics", "SQL", "Machine Learning", "Data Analysis"]},
     "MLOps Engineer": {"readiness": 18, "market": 15.1, "critical": ["Docker", "CI/CD", "Kubernetes", "MLOps"]},
-    "AI Product Engineer": {"readiness": 29, "market": 13.1, "critical": ["LLMs", "RAG", "AI Agents", "Cloud"]},
+    "AI Product Engineer": {"readiness": 29, "market": 13.1, "critical": ["LLMs", "RAG", "AI Agents", "Cloud Computing"]},
 }
 
 SKILL_IMPACT = {
