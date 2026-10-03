@@ -49,6 +49,16 @@ const modules = [
     metricLabel: "Prediction signal",
   },
   {
+    title: "Future Shock Lab",
+    description:
+      "Run workforce what-if scenarios, model demand shocks and visualize reskilling impact before making decisions.",
+    href: "/future-lab",
+    icon: Zap,
+    accent: "cyan",
+    metric: "2030",
+    metricLabel: "Scenario engine",
+  },
+  {
     title: "System Database",
     description:
       "Explore the underlying workforce graph, capabilities, roles, skills and intelligence records.",
@@ -345,7 +355,7 @@ export default function HomePage() {
               </h2>
 
               <p className="mt-2 text-sm text-slate-500">
-                Four connected intelligence environments.
+                Five connected intelligence environments.
               </p>
             </div>
 
