@@ -171,6 +171,7 @@ function connectedDot(online: boolean) {
    ========================================================================== */
 
 export default function DatabaseView() {
+  const router = useRouter();
   const [adminAllowed, setAdminAllowed] = useState<boolean | null>(null);
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [loading, setLoading] = useState(true);
