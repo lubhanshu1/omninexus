@@ -3,6 +3,7 @@ from pathlib import Path
 import uuid
 
 from sqlalchemy import create_engine, inspect, text
+from sqlalchemy.engine import make_url
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 from app.core.config import settings
@@ -66,7 +67,7 @@ def get_database_url() -> str:
 
     Useful for debugging without exposing passwords.
     """
-    return DATABASE_URL
+    return make_url(DATABASE_URL).render_as_string(hide_password=True)
 
 
 def get_sqlite_path() -> str | None:
