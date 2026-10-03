@@ -58,7 +58,7 @@ type FutureLabSimulation = {
   hiring_need: number;
   risk: number;
   skills: FutureLabSkill[];
-  recommended_transition?: string;
+  recommended_transition?: string[];
   model_version?: string;
 };
 
