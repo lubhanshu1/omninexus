@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.security import (
     create_access_token,
     get_current_user,
@@ -102,6 +103,7 @@ def signup(
     user = User(
         email=email,
         password_hash=hash_password(request.password),
+        role="admin" if email in settings.ADMIN_EMAILS else "user",
     )
     user.last_active = datetime.now(timezone.utc).isoformat()
 
@@ -199,6 +201,12 @@ def login(
         )
 
     clear_rate_limit(rate_key)
+
+    # Keep the configured admin account synchronized with the admin allowlist.
+    # This also upgrades an already-registered admin account on its next login.
+    if email in settings.ADMIN_EMAILS:
+        user.role = "admin"
+
     user.last_active = datetime.now(timezone.utc).isoformat()
     db.commit()
 
