@@ -40,7 +40,12 @@ import {
   Zap,
 } from "lucide-react";
 
-const API_BASE = "http://127.0.0.1:8001";
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
+  (typeof window !== "undefined" &&
+  !["localhost", "127.0.0.1"].includes(window.location.hostname)
+    ? "https://omninexus-api-prod.onrender.com"
+    : "http://localhost:8001");
 
 const AVAILABLE_SKILLS = [
   "Python",
