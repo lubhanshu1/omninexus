@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Activity,
@@ -48,7 +47,6 @@ function clamp(value: number, min: number, max: number) {
 }
 
 export default function FutureLabPage() {
-  const searchParams = useSearchParams();
   const [role, setRole] = useState("AI Engineer");
   const [demandShock, setDemandShock] = useState(25);
   const [reskill, setReskill] = useState(12);
@@ -56,9 +54,9 @@ export default function FutureLabPage() {
   const profile = roleProfiles[role];
 
   useEffect(() => {
-    const requestedRole = searchParams.get("role");
+    const requestedRole = new URLSearchParams(window.location.search).get("role");
     if (requestedRole && roleProfiles[requestedRole]) setRole(requestedRole);
-  }, [searchParams]);
+  }, []);
   const [apiSimulation, setApiSimulation] = useState<any>(null);
   const [apiStatus, setApiStatus] = useState<"syncing" | "live" | "fallback">("syncing");
 
