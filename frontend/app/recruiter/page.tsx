@@ -345,6 +345,7 @@ export default function RecruiterDashboard() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            ...authHeaders(),
           },
           body: JSON.stringify({
             current_skills:
@@ -354,12 +355,20 @@ export default function RecruiterDashboard() {
         }
       );
 
-      const data = await response.json();
+      const raw = await response.text();
+      let data: AnalysisResult = {};
+      try {
+        data = raw ? JSON.parse(raw) : {};
+      } catch {
+        data = {};
+      }
 
-      if (response.ok) {
+      if (response.ok && data.status === "success") {
         setAnalysis(data);
         setBackendOnline(true);
       } else {
+        // A backend error is not an API outage. Keep the health indicator true
+        // and show a deterministic local result for the current candidate.
         setBackendOnline(true);
         const localScore = calculateLocalScore(skills);
         setAnalysis({
