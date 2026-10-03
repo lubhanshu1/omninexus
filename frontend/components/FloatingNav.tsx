@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { apiUrl, getStoredToken } from "@/lib/api";
 import {
@@ -42,6 +43,28 @@ const navItems = [
 export default function FloatingNav() {
   const pathname = usePathname();
   const router = useRouter();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const token = getStoredToken();
+    if (!token) {
+      setIsAdmin(false);
+      return;
+    }
+
+    fetch(apiUrl("/api/v1/auth/me"), {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store",
+    })
+      .then(async (response) => {
+        if (!response.ok) return null;
+        return response.json();
+      })
+      .then((user) => {
+        setIsAdmin(user?.role?.trim().toLowerCase() === "admin");
+      })
+      .catch(() => setIsAdmin(false));
+  }, [pathname]);
 
   const handleLogout = async () => {
     const token = getStoredToken();
@@ -159,7 +182,7 @@ export default function FloatingNav() {
             sm:gap-2
           "
         >
-          {navItems.map((item) => {
+          {navItems.filter((item) => item.path !== "/database" || isAdmin).map((item) => {
             const Icon = item.icon;
 
             const isActive =
