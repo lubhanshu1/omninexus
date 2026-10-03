@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -8,36 +8,21 @@ import {
   Activity,
   BriefcaseBusiness,
   Database,
+  GraduationCap,
   LogOut,
   Network,
+  Radar,
   Sparkles,
+  Users,
+  Zap,
 } from "lucide-react";
 
 const navItems = [
-  {
-    name: "Career Simulator",
-    shortName: "Career",
-    path: "/career-simulator",
-    icon: Sparkles,
-  },
-  {
-    name: "Talent Matcher",
-    shortName: "Talent",
-    path: "/recruiter",
-    icon: Network,
-  },
-  {
-    name: "Workforce",
-    shortName: "Observatory",
-    path: "/observatory",
-    icon: Activity,
-  },
-  {
-    name: "Database",
-    shortName: "System DB",
-    path: "/database",
-    icon: Database,
-  },
+  { name: "Career", path: "/career-simulator", icon: Sparkles },
+  { name: "Talent", path: "/recruiter", icon: Users },
+  { name: "Observatory", path: "/observatory", icon: Radar },
+  { name: "Future Lab", path: "/future-lab", icon: Zap },
+  { name: "Database", path: "/database", icon: Database },
 ];
 
 export default function FloatingNav() {
@@ -53,16 +38,11 @@ export default function FloatingNav() {
     }
 
     fetch(apiUrl("/api/v1/auth/me"), {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: "Bearer " + token },
       cache: "no-store",
     })
-      .then(async (response) => {
-        if (!response.ok) return null;
-        return response.json();
-      })
-      .then((user) => {
-        setIsAdmin(user?.role?.trim().toLowerCase() === "admin");
-      })
+      .then(async (response) => (response.ok ? response.json() : null))
+      .then((user) => setIsAdmin(user?.role?.trim().toLowerCase() === "admin"))
       .catch(() => setIsAdmin(false));
   }, [pathname]);
 
@@ -72,7 +52,7 @@ export default function FloatingNav() {
       if (token) {
         await fetch(apiUrl("/api/v1/auth/logout"), {
           method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: "Bearer " + token },
           keepalive: true,
         });
       }
@@ -88,319 +68,66 @@ export default function FloatingNav() {
     }
   };
 
-  // Hide global navigation on authentication page
-  if (pathname === "/login") {
-    return null;
-  }
+  if (pathname === "/login") return null;
+
+  const visibleItems = navItems.filter((item) => item.path !== "/database" || isAdmin);
 
   return (
-    <nav
-      aria-label="OmniNexus global navigation"
-      className="
-        fixed
-        bottom-5
-        left-1/2
-        -translate-x-1/2
-        z-[9999]
-
-        w-[calc(100%-20px)]
-        sm:w-[calc(100%-32px)]
-
-        max-w-[1280px]
-
-        rounded-[22px]
-        border
-        border-slate-700/70
-
-        bg-[#07111f]/95
-        backdrop-blur-2xl
-
-        shadow-[0_20px_60px_rgba(0,0,0,0.45)]
-
-        px-2
-        sm:px-3
-        py-2
-
-        transition-all
-        duration-300
-      "
-    >
-      <div className="flex items-center gap-2 sm:gap-3">
-
-        {/* =========================================================
-            OMNINEXUS HOME / SYSTEM BUTTON
-        ========================================================= */}
-        <Link
-          href="/career-simulator"
-          className="
-            flex
-            h-11
-            w-11
-            shrink-0
-            items-center
-            justify-center
-
-            rounded-xl
-
-            border
-            border-cyan-500/20
-
-            bg-cyan-500/[0.06]
-
-            text-cyan-400
-
-            transition-all
-            duration-200
-
-            hover:border-cyan-400/40
-            hover:bg-cyan-400/[0.10]
-            hover:text-cyan-300
-            hover:shadow-[0_0_25px_rgba(34,211,238,0.15)]
-
-            active:scale-95
-          "
-          title="OmniNexus Home"
-          aria-label="Go to OmniNexus Home"
-        >
-          <BriefcaseBusiness
-            size={19}
-            strokeWidth={2}
-          />
+    <>
+      <aside className="omni-sidebar fixed left-3 top-3 z-[9999] hidden h-[calc(100vh-24px)] w-[68px] flex-col items-center border border-white/[0.08] bg-[#0a0c0c]/95 py-3 backdrop-blur-2xl lg:flex">
+        <Link href="/" title="OmniNexus home" className="omni-side-logo">
+          <Network size={19} />
         </Link>
 
-        {/* =========================================================
-            MAIN NAVIGATION
-        ========================================================= */}
-        <div
-          className="
-            flex
-            min-w-0
-            flex-1
-            items-center
-            justify-center
-            gap-1
-            sm:gap-2
-          "
-        >
-          {navItems.filter((item) => item.path !== "/database" || isAdmin).map((item) => {
+        <div className="my-5 h-px w-8 bg-white/[0.08]" />
+
+        <nav className="flex flex-1 flex-col items-center gap-1.5">
+          <Link href="/" title="Command center" className={"omni-side-item " + (pathname === "/" ? "active" : "")}>
+            <Activity size={17} />
+          </Link>
+
+          {visibleItems.map((item) => {
             const Icon = item.icon;
-
-            const isActive =
-              pathname === item.path ||
-              pathname.startsWith(`${item.path}/`);
-
+            const active = pathname === item.path || pathname.startsWith(item.path + "/");
             return (
               <Link
                 key={item.path}
                 href={item.path}
-                aria-current={isActive ? "page" : undefined}
-                className={`
-                  group
-                  relative
-
-                  flex
-                  h-11
-                  min-w-0
-                  flex-1
-                  sm:flex-none
-
-                  items-center
-                  justify-center
-                  gap-1.5
-                  sm:gap-2
-
-                  rounded-xl
-
-                  px-2
-                  sm:px-4
-                  lg:px-5
-
-                  text-[11px]
-                  sm:text-xs
-
-                  font-semibold
-
-                  whitespace-nowrap
-
-                  transition-all
-                  duration-200
-
-                  active:scale-[0.98]
-
-                  ${isActive
-                    ? `
-                        bg-cyan-400
-                        text-[#03111c]
-
-                        shadow-[0_0_25px_rgba(34,211,238,0.25)]
-
-                        hover:bg-cyan-300
-                      `
-                    : `
-                        text-slate-400
-
-                        hover:bg-slate-800/80
-                        hover:text-white
-                      `
-                  }
-                `}
+                title={item.name}
+                className={"omni-side-item " + (active ? "active" : "")}
               >
-                {/* Icon */}
-                <Icon
-                  size={16}
-                  strokeWidth={2}
-                  className="
-                    shrink-0
-                    transition-transform
-                    duration-200
-                    group-hover:scale-110
-                  "
-                />
-
-                {/* =================================================
-                    DESKTOP / TABLET LABEL
-                ================================================= */}
-                <span className="hidden sm:inline">
-                  {item.name}
-                </span>
-
-                {/* =================================================
-                    MOBILE LABEL
-                ================================================= */}
-                <span className="inline sm:hidden">
-                  {item.shortName}
-                </span>
-
-                {/* =================================================
-                    ACTIVE INDICATOR
-                ================================================= */}
-                {isActive && (
-                  <span
-                    className="
-                      absolute
-                      -bottom-1
-
-                      left-1/2
-                      -translate-x-1/2
-
-                      h-0.5
-                      w-8
-
-                      rounded-full
-
-                      bg-cyan-300
-
-                      shadow-[0_0_8px_rgba(103,232,249,0.8)]
-                    "
-                  />
-                )}
+                <Icon size={17} />
               </Link>
             );
           })}
-        </div>
+        </nav>
 
-        {/* =========================================================
-            SYSTEM STATUS
-        ========================================================= */}
-        <div
-          className="
-            hidden
-            lg:flex
-
-            h-11
-            shrink-0
-
-            items-center
-            gap-2
-
-            rounded-xl
-
-            border
-            border-emerald-500/20
-
-            bg-emerald-500/[0.05]
-
-            px-4
-
-            text-xs
-            font-semibold
-
-            text-emerald-400
-          "
-          title="OmniNexus system status"
-        >
-          <span
-            className="
-              h-2
-              w-2
-              shrink-0
-
-              rounded-full
-
-              bg-emerald-400
-
-              shadow-[0_0_10px_rgba(52,211,153,0.8)]
-
-              animate-pulse
-            "
-          />
-
-          <span>API ONLINE</span>
-        </div>
-
-        {/* =========================================================
-            LOGOUT
-        ========================================================= */}
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="
-            flex
-            h-11
-            shrink-0
-
-            items-center
-            justify-center
-            gap-2
-
-            rounded-xl
-
-            border
-            border-rose-500/20
-
-            bg-rose-500/[0.04]
-
-            px-3
-            sm:px-4
-
-            text-xs
-            font-semibold
-
-            text-rose-400
-
-            transition-all
-            duration-200
-
-            hover:border-rose-400/40
-            hover:bg-rose-500/[0.10]
-            hover:text-rose-300
-            hover:shadow-[0_0_20px_rgba(244,63,94,0.10)]
-
-            active:scale-95
-          "
-          title="Logout"
-          aria-label="Logout"
-        >
-          <LogOut
-            size={16}
-            strokeWidth={2}
-          />
-
-          <span className="hidden sm:inline">
-            Logout
-          </span>
+        <button onClick={handleLogout} title="Logout" className="omni-side-logout">
+          <LogOut size={16} />
         </button>
-      </div>
-    </nav>
+      </aside>
+
+      <nav className="omni-mobile-nav fixed bottom-3 left-3 right-3 z-[9999] flex items-center gap-1 overflow-x-auto border border-white/[0.08] bg-[#0a0c0c]/95 p-1.5 backdrop-blur-2xl lg:hidden">
+        <Link href="/" className={"omni-mobile-item " + (pathname === "/" ? "active" : "")}>
+          <Network size={15} />
+          <span>Home</span>
+        </Link>
+
+        {visibleItems.map((item) => {
+          const Icon = item.icon;
+          const active = pathname === item.path || pathname.startsWith(item.path + "/");
+          return (
+            <Link key={item.path} href={item.path} className={"omni-mobile-item " + (active ? "active" : "")}>
+              <Icon size={15} />
+              <span>{item.name}</span>
+            </Link>
+          );
+        })}
+
+        <button onClick={handleLogout} className="omni-mobile-logout" title="Logout">
+          <LogOut size={15} />
+        </button>
+      </nav>
+    </>
   );
 }
