@@ -171,6 +171,7 @@ function connectedDot(online: boolean) {
    ========================================================================== */
 
 export default function DatabaseView() {
+  const [adminAllowed, setAdminAllowed] = useState<boolean | null>(null);
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -196,6 +197,26 @@ export default function DatabaseView() {
   const [exporting, setExporting] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [showControls, setShowControls] = useState(false);
+
+  if (adminAllowed === null) {
+    return (
+      <main className="min-h-screen bg-[#030912] text-white flex items-center justify-center">
+        <div className="rounded-2xl border border-slate-800 bg-[#07111f] px-6 py-5 text-sm font-semibold text-slate-400">
+          Verifying administrator access...
+        </div>
+      </main>
+    );
+  }
+
+  if (adminAllowed === false) {
+    return (
+      <main className="min-h-screen bg-[#030912] text-white flex items-center justify-center">
+        <div className="rounded-2xl border border-rose-500/30 bg-[#100a12] px-6 py-5 text-sm font-semibold text-rose-300">
+          Access denied. Administrator access required.
+        </div>
+      </main>
+    );
+  }
 
   /* ========================================================================
      COPY
@@ -380,13 +401,49 @@ export default function DatabaseView() {
   );
 
   /* ========================================================================
+     ADMIN ACCESS GATE
+     ======================================================================== */
+
+  useEffect(() => {
+    const verifyAdmin = async () => {
+      if (typeof window === "undefined") return;
+
+      const token = sessionStorage.getItem("omninexus_token");
+      if (!token) {
+        setAdminAllowed(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/api/v1/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          setAdminAllowed(false);
+          return;
+        }
+
+        const user = await response.json();
+        setAdminAllowed(user?.role?.trim().toLowerCase() === "admin");
+      } catch {
+        setAdminAllowed(false);
+      }
+    };
+
+    verifyAdmin();
+  }, []);
+
+  /* ========================================================================
      INITIAL LOAD
      ======================================================================== */
 
   useEffect(() => {
+    if (adminAllowed !== true) return;
     checkHealth();
     fetchUsers();
-  }, [checkHealth, fetchUsers]);
+  }, [adminAllowed, checkHealth, fetchUsers]);
 
   /* ========================================================================
      AUTO REFRESH
