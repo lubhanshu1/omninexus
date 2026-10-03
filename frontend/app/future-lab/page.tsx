@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { API_BASE_URL, authHeaders } from "@/lib/api";
 import Link from "next/link";
 import {
   Activity,
@@ -79,8 +80,6 @@ export default function FutureLabPage() {
   }, []);
   const [apiSimulation, setApiSimulation] = useState<FutureLabSimulation | null>(null);
   const [apiStatus, setApiStatus] = useState<"syncing" | "live" | "fallback">("syncing");
-
-  import { API_BASE_URL, authHeaders } from "@/lib/api";
 
   useEffect(() => {
     const controller = new AbortController();
