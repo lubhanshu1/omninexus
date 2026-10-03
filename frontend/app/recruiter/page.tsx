@@ -63,6 +63,9 @@ const AVAILABLE_SKILLS = [
   "CI/CD",
   "SQL",
   "Data Analysis",
+  "Pandas",
+  "Statistics",
+  "Visualization",
 ];
 
 const ROLE_REQUIREMENTS: Record<string, string[]> = {
@@ -172,7 +175,16 @@ export default function RecruiterDashboard() {
   const [selectedCandidate, setSelectedCandidate] =
     useState<Candidate | null>(null);
 
-  const [shortlistedNames, setShortlistedNames] = useState<string[]>([]);
+  const [shortlistedNames, setShortlistedNames] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const saved = window.localStorage.getItem("omninexus-recruiter-shortlist");
+      const parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
   const [recommendationStep, setRecommendationStep] = useState(0);
 
   const [showFilters, setShowFilters] = useState(false);
@@ -212,16 +224,6 @@ export default function RecruiterDashboard() {
     const interval = setInterval(checkBackend, 10000);
 
     return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    try {
-      const saved = window.localStorage.getItem("omninexus-recruiter-shortlist");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) setShortlistedNames(parsed);
-      }
-    } catch { }
   }, []);
 
   useEffect(() => {
@@ -267,6 +269,7 @@ export default function RecruiterDashboard() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            ...authHeaders(),
           },
           body: JSON.stringify({
             resume_text: resumeText,
@@ -356,6 +359,15 @@ export default function RecruiterDashboard() {
       if (response.ok) {
         setAnalysis(data);
         setBackendOnline(true);
+      } else {
+        setBackendOnline(true);
+        const localScore = calculateLocalScore(skills);
+        setAnalysis({
+          status: "local",
+          readiness_score: localScore,
+          bottleneck_skill: calculateMissingSkills(skills)[0] || "None",
+          market_value: calculateMarketValue(skills),
+        });
       }
     } catch (error) {
       console.error("Talent analysis failed:", error);
@@ -484,23 +496,23 @@ export default function RecruiterDashboard() {
     };
 
     const candidateB: Candidate = {
-      name: "Candidate B",
+      name: "Candidate B · Demo",
       score: Math.max(0, primaryScore - 13),
       current: ["Python", "SQL"],
       missing: ["PyTorch", "Docker"],
       status: "Moderate Match",
-      evidence: "Resume Parser",
+      evidence: "Demo dataset · Resume Parser",
       evidenceScore: 72,
       timeToReady: "Est. 2.5 Months",
     };
 
     const candidateC: Candidate = {
-      name: "Candidate C",
+      name: "Candidate C · Demo",
       score: Math.max(0, primaryScore - 29),
       current: ["Data Analysis"],
       missing: ["Cloud Computing", "PyTorch", "MLOps"],
       status: "Upskilling Required",
-      evidence: "Assessment Pending",
+      evidence: "Demo dataset · Assessment Pending",
       evidenceScore: 42,
       timeToReady: "Est. 6+ Months",
     };
