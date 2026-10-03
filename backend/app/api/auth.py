@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from datetime import datetime, timezone
+
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -7,6 +9,8 @@ from app.core.security import (
     get_current_user,
     hash_password,
     verify_password,
+    check_rate_limit,
+    clear_rate_limit,
 )
 from app.database import get_db
 from app.models.user import User
@@ -51,9 +55,13 @@ def normalize_email(email: str) -> str:
 )
 def signup(
     request: SignupRequest,
+    http_request: Request,
     db: Session = Depends(get_db),
 ):
     email = normalize_email(request.email)
+    ip = http_request.client.host if http_request.client else "unknown"
+    check_rate_limit(f"signup-ip:{ip}", 10, 600)
+    check_rate_limit(f"signup-email:{email}", 5, 600)
 
     # --------------------------------------------------------
     # Basic validation
@@ -69,12 +77,6 @@ def signup(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Password is required.",
-        )
-
-    if len(request.password) < 6:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Password must contain at least 6 characters.",
         )
 
     # --------------------------------------------------------
@@ -146,9 +148,13 @@ def signup(
 )
 def login(
     request: LoginRequest,
+    http_request: Request,
     db: Session = Depends(get_db),
 ):
     email = normalize_email(request.email)
+    ip = http_request.client.host if http_request.client else "unknown"
+    rate_key = f"login:{ip}:{email}"
+    check_rate_limit(rate_key, 8, 300)
 
     # --------------------------------------------------------
     # Find user
@@ -173,6 +179,12 @@ def login(
             },
         )
 
+    if not user.is_active or user.status.strip().lower() != "active":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User account is inactive.",
+        )
+
     if not verify_password(
         request.password,
         user.password_hash,
@@ -184,6 +196,10 @@ def login(
                 "WWW-Authenticate": "Bearer",
             },
         )
+
+    clear_rate_limit(rate_key)
+    user.last_active = datetime.now(timezone.utc).isoformat()
+    db.commit()
 
     # --------------------------------------------------------
     # Create JWT
