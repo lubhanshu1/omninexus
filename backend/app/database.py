@@ -137,6 +137,7 @@ def ensure_database_schema() -> None:
         "status": "VARCHAR",
         "last_active": "VARCHAR",
         "is_active": "BOOLEAN",
+        "token_version": "INTEGER",
     }
 
     with engine.begin() as conn:
@@ -152,7 +153,7 @@ def ensure_database_schema() -> None:
         rows = conn.execute(text("SELECT id FROM users")).fetchall()
         for (user_id,) in rows:
             conn.execute(
-                text("UPDATE users SET uuid = COALESCE(NULLIF(uuid, ''), :uuid), role = COALESCE(NULLIF(role, ''), 'Talent Node'), status = COALESCE(NULLIF(status, ''), 'Active'), last_active = COALESCE(NULLIF(last_active, ''), :last_active), is_active = COALESCE(is_active, 1) WHERE id = :id"),
+                text("UPDATE users SET uuid = COALESCE(NULLIF(uuid, ''), :uuid), role = COALESCE(NULLIF(role, ''), 'Talent Node'), status = COALESCE(NULLIF(status, ''), 'Active'), last_active = COALESCE(NULLIF(last_active, ''), :last_active), is_active = COALESCE(is_active, 1), token_version = COALESCE(token_version, 0) WHERE id = :id"),
                 {"uuid": f"usr_{uuid.uuid4().hex[:8]}", "last_active": now, "id": user_id},
             )
 
