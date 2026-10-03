@@ -625,6 +625,7 @@ export default function OmniNexusDashboard() {
         {
           method: "GET",
           cache: "no-store",
+          signal: controller.signal,
         }
       );
 
@@ -659,8 +660,12 @@ export default function OmniNexusDashboard() {
      CAREER GRAPH ANALYSIS
   ======================================================= */
 
+  const analysisRequestRef = useRef(0);
+
   const fetchGraph = useCallback(async () => {
+    const requestId = ++analysisRequestRef.current;
     setIsAnalyzing(true);
+    const controller = new AbortController();
 
     const started = performance.now();
 
@@ -671,6 +676,7 @@ export default function OmniNexusDashboard() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            ...authHeaders(),
           },
           body: JSON.stringify({
             current_skills: currentSkills,
@@ -694,6 +700,8 @@ export default function OmniNexusDashboard() {
 
       const data: AnalysisResponse =
         await response.json();
+
+      if (requestId !== analysisRequestRef.current) return;
 
       if (response.ok && data.status === "success") {
         if (data.flow_nodes) {
@@ -723,6 +731,7 @@ export default function OmniNexusDashboard() {
         );
       }
     } catch (error) {
+      if (controller.signal.aborted || requestId !== analysisRequestRef.current) return;
       console.warn("OmniNexus analysis fallback:", error);
 
       // IMPORTANT: analysis failure is not the same as API failure.
@@ -744,7 +753,7 @@ export default function OmniNexusDashboard() {
         }) + " · local intelligence"
       );
     } finally {
-      setIsAnalyzing(false);
+      if (requestId === analysisRequestRef.current) setIsAnalyzing(false);
     }
   }, [
     currentSkills,
@@ -768,7 +777,8 @@ export default function OmniNexusDashboard() {
   ======================================================= */
 
   useEffect(() => {
-    fetchGraph();
+    const timer = window.setTimeout(() => fetchGraph(), 250);
+    return () => window.clearTimeout(timer);
   }, [fetchGraph]);
 
   /* =======================================================
