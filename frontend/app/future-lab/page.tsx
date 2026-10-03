@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   Activity,
@@ -52,6 +52,36 @@ export default function FutureLabPage() {
   const [reskill, setReskill] = useState(12);
 
   const profile = roleProfiles[role];
+  const [apiSimulation, setApiSimulation] = useState<any>(null);
+  const [apiStatus, setApiStatus] = useState<"syncing" | "live" | "fallback">("syncing");
+
+  const API_BASE_URL =
+    process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
+    (typeof window !== "undefined" && !["localhost", "127.0.0.1"].includes(window.location.hostname)
+      ? "https://omninexus-api-prod.onrender.com"
+      : "http://localhost:8001");
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(API_BASE_URL + "/api/v1/future-lab/simulate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ target_role: role, demand_shock: demandShock, reskill_people: reskill }),
+      signal: controller.signal,
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Future Lab API unavailable");
+        return response.json();
+      })
+      .then((payload) => {
+        setApiSimulation(payload.simulation);
+        setApiStatus("live");
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setApiStatus("fallback");
+      });
+    return () => controller.abort();
+  }, [API_BASE_URL, demandShock, reskill, role]);
 
   const simulation = useMemo(() => {
     const readinessBoost = Math.round(reskill * 2.15);
@@ -68,7 +98,19 @@ export default function FutureLabPage() {
     return { readiness, demand, supply, gap, value, hiringNeed, risk };
   }, [demandShock, profile, reskill]);
 
-  const projectedSkills = useMemo(() => {
+  const displayedSimulation = apiSimulation
+    ? {
+        readiness: apiSimulation.readiness,
+        demand: apiSimulation.demand,
+        supply: apiSimulation.supply,
+        gap: apiSimulation.gap,
+        value: apiSimulation.market_value,
+        hiringNeed: apiSimulation.hiring_need,
+        risk: apiSimulation.risk,
+      }
+    : simulation;
+
+  const localProjectedSkills = useMemo(() => {
     return profile.critical.map((skill, index) => {
       const impact = skillImpact[skill] ?? 8;
       const coverage = clamp(28 + reskill * 2.4 + (3 - index) * 5 - demandShock * 0.35, 8, 97);
@@ -80,6 +122,8 @@ export default function FutureLabPage() {
       };
     });
   }, [demandShock, profile, reskill]);
+
+  const projectedSkills = apiSimulation?.skills ?? localProjectedSkills;
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#050a10] text-slate-300">
@@ -103,8 +147,10 @@ export default function FutureLabPage() {
             </div>
           </div>
           <div className="flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3 py-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
-            <span className="text-[9px] font-black uppercase tracking-widest text-emerald-400">Modeled scenario</span>
+            <span className={"h-1.5 w-1.5 rounded-full " + (apiStatus === "fallback" ? "bg-amber-400" : "bg-emerald-400")} />
+            <span className={"text-[9px] font-black uppercase tracking-widest " + (apiStatus === "fallback" ? "text-amber-400" : "text-emerald-400")}>
+              {apiStatus === "live" ? "Intelligence API live" : apiStatus === "fallback" ? "Local model fallback" : "Syncing intelligence"}
+            </span>
           </div>
         </header>
 
@@ -162,10 +208,10 @@ export default function FutureLabPage() {
 
         <section className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {[
-            [Gauge, "Readiness", simulation.readiness + "%", "Post-scenario capability readiness", "cyan"],
-            [TrendingUp, "Market demand", simulation.demand.toLocaleString(), "Projected demand index", "violet"],
-            [Users, "Talent supply", simulation.supply.toLocaleString(), "Modeled available capacity", "emerald"],
-            [ShieldAlert, "Workforce risk", simulation.risk + "/100", "Capability pressure index", "amber"],
+            [Gauge, "Readiness", displayedSimulation.readiness + "%", "Post-scenario capability readiness", "cyan"],
+            [TrendingUp, "Market demand", displayedSimulation.demand.toLocaleString(), "Projected demand index", "violet"],
+            [Users, "Talent supply", displayedSimulation.supply.toLocaleString(), "Modeled available capacity", "emerald"],
+            [ShieldAlert, "Workforce risk", displayedSimulation.risk + "/100", "Capability pressure index", "amber"],
           ].map(([Icon, label, value, sub, tone]) => {
             const I = Icon as typeof Gauge;
             const color = tone === "emerald" ? "text-emerald-400" : tone === "amber" ? "text-amber-400" : tone === "violet" ? "text-violet-400" : "text-cyan-400";
@@ -232,7 +278,7 @@ export default function FutureLabPage() {
             <div className="mt-6 space-y-3">
               {[
                 ["Demand pressure", "+" + demandShock + "%", demandShock >= 35 ? "High" : demandShock >= 20 ? "Medium" : "Low"],
-                ["Talent gap", simulation.gap + "%", simulation.gap >= 45 ? "Critical" : simulation.gap >= 30 ? "High" : "Moderate"],
+                ["Talent gap", displayedSimulation.gap + "%", displayedSimulation.gap >= 45 ? "Critical" : displayedSimulation.gap >= 30 ? "High" : "Moderate"],
                 ["Reskill leverage", reskill + " people", reskill >= 18 ? "Strong" : reskill >= 8 ? "Moderate" : "Low"],
               ].map(([label, value, level]) => (
                 <div key={label} className="flex items-center justify-between rounded-xl border border-slate-800 bg-[#09131e] p-3">
@@ -251,8 +297,8 @@ export default function FutureLabPage() {
                 <span className="text-[9px] font-black uppercase tracking-widest text-cyan-400">Model insight</span>
               </div>
               <p className="mt-2 text-[11px] leading-5 text-slate-400">
-                {simulation.hiringNeed > 0
-                  ? "The scenario leaves an estimated hiring requirement of " + simulation.hiringNeed + " specialists in the modeled workforce."
+                {displayedSimulation.hiringNeed > 0
+                  ? "The scenario leaves an estimated hiring requirement of " + displayedSimulation.hiringNeed + " specialists in the modeled workforce."
                   : "Reskilling capacity is sufficient to absorb the modeled demand shock without additional specialist hiring."}
               </p>
             </div>
@@ -279,7 +325,7 @@ export default function FutureLabPage() {
         <div className="grid gap-3 sm:grid-cols-3">
           {[
             [CheckCircle2, "Scenario traceable", "Every score is derived from visible inputs."],
-            [CircleDollarSign, "Career economics", "Modeled market signal ₹" + simulation.value.toFixed(1) + "L"],
+            [CircleDollarSign, "Career economics", "Modeled market signal ₹" + displayedSimulation.value.toFixed(1) + "L"],
             [Activity, "Decision ready", "Use the result as a planning signal, not a black-box verdict."],
           ].map(([Icon, title, text]) => {
             const I = Icon as typeof Activity;
