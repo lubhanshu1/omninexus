@@ -107,7 +107,7 @@ def analyze_career_path(
     )
 
     bottleneck_skill = (
-        missing_skills[0]
+        max(missing_skills, key=lambda skill: SKILL_GRAPH_NODES.get(skill, {}).get("val", 0))
         if missing_skills
         else "None"
     )
