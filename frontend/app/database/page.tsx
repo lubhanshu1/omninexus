@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useRouter } from "next/navigation";
 
 import {
   Activity,
@@ -631,7 +632,7 @@ export default function DatabaseView() {
   };
 
   const handleLoginRedirect = () => {
-    window.location.href = "/login";
+    router.push("/login");
   };
 
   /* ========================================================================
