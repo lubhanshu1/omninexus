@@ -5,6 +5,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useRef,
 } from "react";
 
 import {
@@ -683,6 +684,7 @@ export default function OmniNexusDashboard() {
             target_role: targetRole,
           }),
           cache: "no-store",
+          signal: controller.signal,
         }
       );
 
