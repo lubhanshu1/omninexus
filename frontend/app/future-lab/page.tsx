@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Activity,
@@ -47,11 +48,17 @@ function clamp(value: number, min: number, max: number) {
 }
 
 export default function FutureLabPage() {
+  const searchParams = useSearchParams();
   const [role, setRole] = useState("AI Engineer");
   const [demandShock, setDemandShock] = useState(25);
   const [reskill, setReskill] = useState(12);
 
   const profile = roleProfiles[role];
+
+  useEffect(() => {
+    const requestedRole = searchParams.get("role");
+    if (requestedRole && roleProfiles[requestedRole]) setRole(requestedRole);
+  }, [searchParams]);
   const [apiSimulation, setApiSimulation] = useState<any>(null);
   const [apiStatus, setApiStatus] = useState<"syncing" | "live" | "fallback">("syncing");
 
@@ -163,6 +170,15 @@ export default function FutureLabPage() {
               </div>
               <h2 className="max-w-3xl text-3xl font-black leading-tight tracking-tight text-white md:text-4xl">See how demand shocks change your workforce.</h2>
               <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-500">Adjust the scenario, simulate reskilling and watch capability pressure, readiness and hiring requirements change together.</p>
+              <div className="mt-6 flex flex-wrap gap-2">
+                <Link href={"/career-simulator?role=" + encodeURIComponent(role)} className="inline-flex items-center gap-2 rounded-xl border border-cyan-500/20 bg-cyan-500/5 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-cyan-400 transition hover:border-cyan-400/40">
+                  Open Career Simulator <ArrowRight size={13} />
+                </Link>
+                <Link href="/recruiter" className="inline-flex items-center gap-2 rounded-xl border border-slate-800 bg-[#09131e] px-3 py-2 text-[10px] font-black uppercase tracking-widest text-slate-500 transition hover:border-slate-700 hover:text-white">
+                  Talent Matcher
+                </Link>
+              </div>
+
               <div className="mt-7 grid gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl border border-slate-800 bg-[#09131e] p-4">
                   <div className="text-[9px] font-black uppercase tracking-widest text-slate-600">Role</div>
