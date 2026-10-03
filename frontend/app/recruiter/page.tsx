@@ -95,6 +95,40 @@ const ROLE_REQUIREMENTS: Record<string, string[]> = {
   ],
 };
 
+function extractLocalSkills(text: string): string[] {
+  const aliases: Record<string, string> = {
+    "machine learning": "Machine Learning",
+    "deep learning": "Deep Learning",
+    "pytorch": "PyTorch",
+    "llm": "LLMs",
+    "llms": "LLMs",
+    "rag": "RAG",
+    "ai agents": "AI Agents",
+    "cloud": "Cloud Computing",
+    "cloud computing": "Cloud Computing",
+    "aws": "AWS",
+    "docker": "Docker",
+    "kubernetes": "Kubernetes",
+    "mlops": "MLOps",
+    "ci/cd": "CI/CD",
+    "data analysis": "Data Analysis",
+    "pandas": "Pandas",
+    "statistics": "Statistics",
+    "visualization": "Visualization",
+    "sql": "SQL",
+    "python": "Python",
+    "git": "Git",
+  };
+  const normalized = text.toLowerCase();
+  return Array.from(
+    new Set(
+      Object.entries(aliases)
+        .filter(([phrase]) => new RegExp("(^|\\\\W)" + phrase + "(\\\\W|$)", "i").test(normalized))
+        .map(([, skill]) => skill),
+    ),
+  );
+}
+
 type Candidate = {
   name: string;
   score: number;
@@ -296,9 +330,7 @@ export default function RecruiterDashboard() {
          * Graceful fallback if the backend returns a different
          * response shape.
          */
-        const fallbackSkills = AVAILABLE_SKILLS.filter((skill) =>
-          resumeText.toLowerCase().includes(skill.toLowerCase())
-        );
+        const fallbackSkills = extractLocalSkills(resumeText);
 
         setExtractedSkills(fallbackSkills);
 
@@ -349,7 +381,7 @@ export default function RecruiterDashboard() {
           },
           body: JSON.stringify({
             current_skills:
-              skills.length > 0 ? skills : ["Python"],
+              skills,
             target_role: role,
           }),
         }
