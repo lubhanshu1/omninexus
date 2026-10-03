@@ -279,10 +279,6 @@ export default function Login() {
 
   const checkBackendHealth = useCallback(
     async () => {
-      if (loading) {
-        return;
-      }
-
       setHealthState("checking");
 
       setHealthMessage(
@@ -295,7 +291,7 @@ export default function Login() {
 
         const timeout = window.setTimeout(() => {
           controller.abort();
-        }, 5000);
+        }, 10000);
 
         const response = await fetch(
           HEALTH_ENDPOINT,
@@ -379,7 +375,7 @@ export default function Login() {
         }
       }
     },
-    [loading]
+    []
   );
 
   /* =========================================================
@@ -466,9 +462,9 @@ export default function Login() {
       return false;
     }
 
-    if (password.length < 6) {
+    if (password.length < 8) {
       setError(
-        "Password must contain at least 6 characters."
+        "Password must contain at least 8 characters."
       );
 
       return false;
@@ -1646,7 +1642,8 @@ export default function Login() {
                           : "password"
                       }
                       required
-                      minLength={6}
+                      minLength={8}
+                      maxLength={72}
                       autoComplete={
                         isLogin
                           ? "current-password"
@@ -1733,8 +1730,7 @@ export default function Login() {
 
                   {!isLogin && (
                     <p className="mt-2 text-[10px] text-slate-700">
-                      Minimum password length:
-                      6 characters.
+                      Password length: 8–72 characters.
                     </p>
                   )}
                 </div>
