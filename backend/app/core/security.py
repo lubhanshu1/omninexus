@@ -47,22 +47,22 @@ def verify_password(password: str, password_hash: str) -> bool:
         return False
 
 
-def create_access_token(subject: str, expires_delta: timedelta | None = None) -> str:
+def create_access_token(subject: str, expires_delta: timedelta | None = None, token_version: int = 0) -> str:
     if expires_delta is None:
         expires_delta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 
     expire = datetime.now(timezone.utc) + expires_delta
-    to_encode: dict[str, Any] = {"sub": subject, "exp": expire}
+    to_encode: dict[str, Any] = {"sub": subject, "exp": expire, "ver": token_version}
     return jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
 
-def decode_access_token(token: str) -> str:
+def decode_access_token(token: str) -> tuple[str, int]:
     try:
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         subject: str | None = payload.get("sub")
         if subject is None:
             raise ValueError("Missing subject")
-        return subject
+        return subject, int(payload.get("ver", 0))
     except (jwt.InvalidTokenError, ValueError):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -82,7 +82,7 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    email = decode_access_token(credentials.credentials)
+    email, token_version = decode_access_token(credentials.credentials)
     user = db.query(User).filter(User.email == email).first()
     if user is None:
         raise HTTPException(
@@ -90,6 +90,8 @@ def get_current_user(
             detail="User not found",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    if user.token_version != token_version:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session has been revoked.", headers={"WWW-Authenticate": "Bearer"})
     if not user.is_active or user.status.strip().lower() != "active":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User account is inactive.")
     return user
