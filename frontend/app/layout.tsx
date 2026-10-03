@@ -4,7 +4,7 @@ import AuthGate from "@/components/AuthGate";
 
 export const metadata = {
   title: "OmniNexus OS",
-  description: "Workforce Intelligence Operating System",
+  description: "OmniNexus — career intelligence operating system.",
 };
 
 export default function RootLayout({
