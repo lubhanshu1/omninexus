@@ -129,7 +129,7 @@ def signup(
     # Create JWT
     # --------------------------------------------------------
 
-    token = create_access_token(user.email)
+    token = create_access_token(user.email, token_version=user.token_version)
 
     return {
         "status": "success",
@@ -226,3 +226,15 @@ def get_me(
     current_user: User = Depends(get_current_user),
 ):
     return current_user
+
+@router.post(
+    "/logout",
+    summary="Revoke the current session",
+)
+def logout(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    current_user.token_version += 1
+    db.commit()
+    return {"status": "success", "message": "Session revoked."}
