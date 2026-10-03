@@ -123,7 +123,7 @@ function extractLocalSkills(text: string): string[] {
   return Array.from(
     new Set(
       Object.entries(aliases)
-        .filter(([phrase]) => new RegExp("(^|\\\\W)" + phrase + "(\\\\W|$)", "i").test(normalized))
+        .filter(([phrase]) => new RegExp("(^|\\W)" + phrase + "(\\W|$)", "i").test(normalized))
         .map(([, skill]) => skill),
     ),
   );
