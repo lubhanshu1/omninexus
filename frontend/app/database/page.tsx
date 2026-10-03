@@ -66,12 +66,9 @@ type HealthState = "ONLINE" | "OFFLINE" | "CHECKING" | "UNKNOWN";
 type FilterType = "ALL" | "ACTIVE" | "INACTIVE";
 type SortType = "NEWEST" | "OLDEST" | "EMAIL" | "ROLE" | "STATUS";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
-  (typeof window !== "undefined" &&
-  !["localhost", "127.0.0.1"].includes(window.location.hostname)
-    ? "https://omninexus-api-prod.onrender.com"
-    : "http://localhost:8001");
+import { API_BASE_URL } from "@/lib/api";
+
+const API_URL = API_BASE_URL
 
 const AUTO_REFRESH_MS = 30000;
 
