@@ -42,6 +42,26 @@ const skillImpact: Record<string, number> = {
   Kubernetes: 6,
 };
 
+type FutureLabSkill = {
+  skill: string;
+  impact: number;
+  coverage: number;
+  priority: string;
+};
+
+type FutureLabSimulation = {
+  readiness: number;
+  demand: number;
+  supply: number;
+  gap: number;
+  market_value: number;
+  hiring_need: number;
+  risk: number;
+  skills: FutureLabSkill[];
+  recommended_transition?: string;
+  model_version?: string;
+};
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
@@ -57,7 +77,7 @@ export default function FutureLabPage() {
     const requestedRole = new URLSearchParams(window.location.search).get("role");
     if (requestedRole && roleProfiles[requestedRole]) setRole(requestedRole);
   }, []);
-  const [apiSimulation, setApiSimulation] = useState<any>(null);
+  const [apiSimulation, setApiSimulation] = useState<FutureLabSimulation | null>(null);
   const [apiStatus, setApiStatus] = useState<"syncing" | "live" | "fallback">("syncing");
 
   const API_BASE_URL =
