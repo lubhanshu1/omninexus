@@ -31,8 +31,6 @@ import {
 
 import { API_BASE_URL } from "@/lib/api";
 
-const IS_PRODUCTION_API
-
 const IS_PRODUCTION_API = API_BASE_URL.includes("onrender.com");
 
 const HEALTH_ENDPOINT = `${API_BASE_URL}/api/v1/health`;
