@@ -381,6 +381,8 @@ export default function Login() {
 
   useEffect(() => {
     checkBackendHealth();
+    const retryTimer = window.setInterval(checkBackendHealth, 15000);
+    return () => window.clearInterval(retryTimer);
   }, [checkBackendHealth]);
 
   /* =========================================================
