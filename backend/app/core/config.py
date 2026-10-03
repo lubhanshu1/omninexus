@@ -20,6 +20,7 @@ class Settings:
         self.JWT_SECRET_KEY = jwt_secret
 
         self.JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+        self.ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
         self.ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
         self.ADMIN_EMAILS = {
             email.strip().lower()
