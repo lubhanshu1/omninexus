@@ -1,4 +1,6 @@
+from datetime import datetime, timezone
 from pathlib import Path
+import uuid
 
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import declarative_base, sessionmaker
@@ -11,6 +13,10 @@ from app.core.config import settings
 # ============================================================
 
 DATABASE_URL = settings.DATABASE_URL
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
+if DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
 
 
 # SQLite needs this for FastAPI's threaded request handling.
@@ -134,19 +140,21 @@ def ensure_database_schema() -> None:
     }
 
     with engine.begin() as conn:
-
         for column_name, column_type in required_columns.items():
-
             if column_name not in columns:
-
                 conn.execute(
                     text(
-                        f"""
-                        ALTER TABLE users
-                        ADD COLUMN {column_name} {column_type}
-                        """
+                        f"""ALTER TABLE users ADD COLUMN {column_name} {column_type}"""
                     )
                 )
+
+        now = datetime.now(timezone.utc).isoformat()
+        rows = conn.execute(text("SELECT id FROM users")).fetchall()
+        for (user_id,) in rows:
+            conn.execute(
+                text("UPDATE users SET uuid = COALESCE(NULLIF(uuid, ''), :uuid), role = COALESCE(NULLIF(role, ''), 'Talent Node'), status = COALESCE(NULLIF(status, ''), 'Active'), last_active = COALESCE(NULLIF(last_active, ''), :last_active), is_active = COALESCE(is_active, 1) WHERE id = :id"),
+                {"uuid": f"usr_{uuid.uuid4().hex[:8]}", "last_active": now, "id": user_id},
+            )
 
 
 # ============================================================
