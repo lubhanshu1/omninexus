@@ -577,27 +577,6 @@ export default function Login() {
         /*
          * Global authentication marker.
          */
-        localStorage.setItem(
-          "omninexus_authenticated",
-          "true"
-        );
-
-        /*
-         * Optional user email for UI components.
-         */
-        localStorage.setItem(
-          "omninexus_user_email",
-          email.trim()
-        );
-
-        /*
-         * Store login timestamp.
-         */
-        localStorage.setItem(
-          "omninexus_login_time",
-          new Date().toISOString()
-        );
-
         setSuccess(
           "Signed in. Opening your workspace..."
         );
@@ -632,16 +611,6 @@ export default function Login() {
         sessionStorage.setItem(
           "omninexus_token",
           signupToken
-        );
-
-        localStorage.setItem(
-          "omninexus_authenticated",
-          "true"
-        );
-
-        localStorage.setItem(
-          "omninexus_user_email",
-          email.trim()
         );
 
         setSuccess(
