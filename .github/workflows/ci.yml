@@ -22,7 +22,7 @@ jobs:
         run: pip install -r requirements.txt
       - name: Run tests
         env:
-          JWT_SECRET_KEY: ci-test-secret
+          JWT_SECRET_KEY: ci-test-secret-0123456789-abcdef-0123456789
         run: python -m pytest -q
 
   frontend:
