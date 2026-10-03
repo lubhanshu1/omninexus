@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Activity,
   ArrowDown,
@@ -190,6 +191,7 @@ const DEFAULT_SKILL_INTELLIGENCE: SkillIntelligence = {
 };
 
 export default function RecruiterDashboard() {
+  const router = useRouter();
   const [role, setRole] = useState("AI Engineer");
   const [roleQuery, setRoleQuery] = useState("AI Engineer");
 
@@ -2000,7 +2002,7 @@ Computer Science student with experience in Python, SQL, Pandas, NumPy, Machine 
 
           <button
             onClick={() =>
-              (window.location.href = "/")
+              router.push("/")
             }
             className="px-5 py-3 rounded-xl text-xs font-black text-slate-500 hover:text-white transition"
           >
@@ -2015,7 +2017,7 @@ Computer Science student with experience in Python, SQL, Pandas, NumPy, Machine 
 
           <button
             onClick={() =>
-              (window.location.href = "/observatory")
+              router.push("/observatory")
             }
             className="px-5 py-3 rounded-xl text-xs font-black text-slate-500 hover:text-white transition hidden sm:block"
           >
@@ -2024,7 +2026,7 @@ Computer Science student with experience in Python, SQL, Pandas, NumPy, Machine 
 
           <button
             onClick={() =>
-              (window.location.href = "/database")
+              router.push("/database")
             }
             className="px-5 py-3 rounded-xl text-xs font-black text-slate-500 hover:text-white transition hidden sm:block"
           >
