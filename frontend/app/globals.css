@@ -680,3 +680,88 @@ html[data-theme="light"] .omni-command-trigger {
   color: rgba(15,23,42,.55);
   border-color: rgba(15,23,42,.1);
 }
+
+
+.omni-sidebar {
+  box-shadow: 20px 0 70px rgba(0,0,0,.2);
+}
+.omni-side-logo,
+.omni-side-item,
+.omni-side-logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid transparent;
+  color: rgba(255,255,255,.32);
+  transition: .2s ease;
+}
+.omni-side-logo {
+  border-color: rgba(200,255,82,.2);
+  background: rgba(200,255,82,.05);
+  color: #c8ff52;
+}
+.omni-side-item:hover {
+  border-color: rgba(255,255,255,.08);
+  background: rgba(255,255,255,.035);
+  color: rgba(255,255,255,.8);
+}
+.omni-side-item.active {
+  border-color: rgba(200,255,82,.2);
+  background: rgba(200,255,82,.08);
+  color: #c8ff52;
+  box-shadow: inset 2px 0 0 #c8ff52, 0 0 25px rgba(200,255,82,.05);
+}
+.omni-side-logout {
+  color: rgba(255,255,255,.25);
+}
+.omni-side-logout:hover {
+  border-color: rgba(244,63,94,.2);
+  background: rgba(244,63,94,.06);
+  color: #fb7185;
+}
+.omni-mobile-nav {
+  box-shadow: 0 20px 60px rgba(0,0,0,.45);
+}
+.omni-mobile-item {
+  display: flex;
+  min-width: 66px;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 8px;
+  color: rgba(255,255,255,.35);
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: .2s ease;
+}
+.omni-mobile-item.active {
+  background: rgba(200,255,82,.08);
+  color: #c8ff52;
+}
+.omni-mobile-logout {
+  display: flex;
+  height: 38px;
+  width: 38px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,.3);
+}
+html[data-theme="light"] .omni-sidebar,
+html[data-theme="light"] .omni-mobile-nav {
+  background: rgba(255,255,255,.96);
+  border-color: rgba(15,23,42,.1);
+}
+html[data-theme="light"] .omni-side-item,
+html[data-theme="light"] .omni-mobile-item {
+  color: rgba(15,23,42,.4);
+}
+html[data-theme="light"] .omni-side-item.active,
+html[data-theme="light"] .omni-mobile-item.active {
+  color: #527500;
+  background: rgba(125,170,30,.1);
+}
