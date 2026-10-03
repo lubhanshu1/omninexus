@@ -88,25 +88,37 @@ export default function FutureLabPage() {
 
   useEffect(() => {
     const controller = new AbortController();
-    fetch(API_BASE_URL + "/api/v1/future-lab/simulate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ target_role: role, demand_shock: demandShock, reskill_people: reskill }),
-      signal: controller.signal,
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error("Future Lab API unavailable");
-        return response.json();
+    const timer = window.setTimeout(() => {
+      setApiSimulation(null);
+      setApiStatus("syncing");
+      fetch(API_BASE_URL + "/api/v1/future-lab/simulate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeaders() },
+        body: JSON.stringify({ target_role: role, demand_shock: demandShock, reskill_people: reskill }),
+        signal: controller.signal,
       })
-      .then((payload) => {
-        setApiSimulation(payload.simulation);
-        setApiStatus("live");
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) setApiStatus("fallback");
-      });
-    return () => controller.abort();
-  }, [API_BASE_URL, demandShock, reskill, role]);
+        .then((response) => {
+          if (!response.ok) throw new Error("Future Lab API unavailable");
+          return response.json();
+        })
+        .then((payload) => {
+          if (!controller.signal.aborted) {
+            setApiSimulation(payload.simulation);
+            setApiStatus("live");
+          }
+        })
+        .catch(() => {
+          if (!controller.signal.aborted) {
+            setApiSimulation(null);
+            setApiStatus("fallback");
+          }
+        });
+    }, 300);
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [demandShock, reskill, role]);
 
   const simulation = useMemo(() => {
     const readinessBoost = Math.round(reskill * 2.15);
