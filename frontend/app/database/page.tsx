@@ -104,6 +104,17 @@ function isUserActive(user: UserRecord): boolean {
   return user.status?.trim().toLowerCase() === "active";
 }
 
+function formatLastActive(value?: string | null): string {
+  if (!value) return "Unknown";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  const seconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+  if (seconds < 60) return "Just now";
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  return `${Math.floor(seconds / 86400)}d ago`;
+}
+
 function formatRole(role?: string | null) {
   if (!role) return "Talent Node";
 
@@ -1575,7 +1586,7 @@ function DesktopUserRow({
       <td className="px-6 py-5">
         <div className="flex items-center gap-2 text-sm text-slate-500">
           <Clock3 size={14} />
-          {safeText(user.last_active, "Unknown")}
+          {formatLastActive(user.last_active)}
         </div>
       </td>
 
@@ -1671,7 +1682,7 @@ function MobileUserCard({
 
         <div className="flex items-center gap-2 text-xs text-slate-600">
           <Clock3 size={13} />
-          {safeText(user.last_active, "Unknown")}
+          {formatLastActive(user.last_active)}
         </div>
       </div>
 
@@ -1810,7 +1821,7 @@ function UserDrawer({
 
             <DetailRow
               label="LAST ACTIVE"
-              value={safeText(user.last_active, "Unknown")}
+              value={formatLastActive(user.last_active)}
               icon={<Clock3 size={15} />}
             />
           </div>
