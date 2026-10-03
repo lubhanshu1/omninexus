@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { apiUrl, getStoredToken } from "@/lib/api";
 import {
   Activity,
   BriefcaseBusiness,
@@ -42,13 +43,23 @@ export default function FloatingNav() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const token = getStoredToken();
     try {
+      if (token) {
+        await fetch(apiUrl("/api/v1/auth/logout"), {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          keepalive: true,
+        });
+      }
+    } catch {
+      // Local session cleanup still happens if the API is unavailable.
+    } finally {
       window.sessionStorage.removeItem("omninexus_token");
       window.localStorage.removeItem("omninexus_authenticated");
       window.localStorage.removeItem("omninexus_user_email");
       window.localStorage.removeItem("omninexus_login_time");
-    } finally {
       router.push("/login");
       router.refresh();
     }
