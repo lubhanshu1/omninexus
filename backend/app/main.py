@@ -1,8 +1,9 @@
 from contextlib import asynccontextmanager
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
+from fastapi.responses import JSONResponse
 
 from app.api.admin import router as admin_router
 from app.api.auth import router as auth_router
@@ -123,6 +124,21 @@ Core capabilities:
 
     openapi_url="/openapi.json" if settings.ENVIRONMENT != "production" else None,
 )
+
+
+@app.middleware("http")
+async def request_size_guard(request: Request, call_next):
+    content_length = request.headers.get("content-length")
+    if content_length:
+        try:
+            if int(content_length) > 1_000_000:
+                return JSONResponse(
+                    status_code=413,
+                    content={"detail": "Request body is too large."},
+                )
+        except ValueError:
+            return JSONResponse(status_code=400, content={"detail": "Invalid Content-Length."})
+    return await call_next(request)
 
 
 # ============================================================
