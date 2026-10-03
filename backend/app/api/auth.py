@@ -103,6 +103,7 @@ def signup(
         email=email,
         password_hash=hash_password(request.password),
     )
+    user.last_active = datetime.now(timezone.utc).isoformat()
 
     try:
         db.add(user)
