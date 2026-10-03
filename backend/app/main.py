@@ -71,7 +71,7 @@ async def lifespan(app: FastAPI):
         print("=" * 70)
         print("OMNINEXUS STARTUP FAILURE")
         print("=" * 70)
-        print(f"Database initialization failed:")
+        print("Database initialization failed:")
         print(str(exc))
         print("=" * 70)
         print()
