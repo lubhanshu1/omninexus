@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 
@@ -11,7 +11,7 @@ from app.api.future_lab import router as future_lab_router
 from app.api.health import router as health_router
 
 from app.core.config import settings
-from app.database import ensure_database_schema
+from app.database import ensure_database_schema, get_db
 
 
 # ============================================================
@@ -46,7 +46,9 @@ async def lifespan(app: FastAPI):
         ensure_database_schema()
 
         print("✓ Database schema      : READY")
-        print(f"✓ Database URL         : {settings.DATABASE_URL}")
+        from sqlalchemy.engine import make_url
+        safe_db_url = make_url(settings.DATABASE_URL).render_as_string(hide_password=True)
+        print(f"✓ Database URL         : {safe_db_url}")
 
         # ----------------------------------------------------
         # API CONFIGURATION
@@ -115,11 +117,11 @@ Core capabilities:
 
     lifespan=lifespan,
 
-    docs_url="/docs",
+    docs_url="/docs" if settings.ENVIRONMENT != "production" else None,
 
-    redoc_url="/redoc",
+    redoc_url="/redoc" if settings.ENVIRONMENT != "production" else None,
 
-    openapi_url="/openapi.json",
+    openapi_url="/openapi.json" if settings.ENVIRONMENT != "production" else None,
 )
 
 
@@ -133,8 +135,6 @@ app.add_middleware(
     allow_origins=settings.CORS_ORIGINS,
 
     # Vercel preview + production domains, while preserving local development.
-    allow_origin_regex=r"^https://([a-z0-9-]+\.)*vercel\.app$|^http://localhost(:\d+)?$|^http://127\.0\.0\.1(:\d+)?$",
-
     # Authentication uses an explicit Authorization header, not browser cookies.
     allow_credentials=False,
 
@@ -238,7 +238,7 @@ async def root():
     tags=["system"],
     summary="Get OmniNexus system status",
 )
-async def system_status():
+async def system_status(db=Depends(get_db)):
     """
     Lightweight system status endpoint.
 
@@ -249,27 +249,24 @@ async def system_status():
         - deployment verification
     """
 
+    try:
+        from sqlalchemy import text
+        db.execute(text("SELECT 1"))
+        database_status = "online"
+        overall = "online"
+    except Exception:
+        database_status = "offline"
+        overall = "degraded"
+
     return {
-        "status": "online",
-
-        "service": (
-            "OmniNexus Intelligence API"
-        ),
-
+        "status": overall,
+        "service": "OmniNexus Intelligence API",
         "version": app.version,
-
-        "environment": (
-            getattr(
-                settings,
-                "ENVIRONMENT",
-                "development",
-            )
-        ),
-
+        "environment": settings.ENVIRONMENT,
         "modules": {
             "authentication": "online",
             "career": "online",
-            "database": "online",
+            "database": database_status,
             "health": "online",
             "admin": "online",
         },
