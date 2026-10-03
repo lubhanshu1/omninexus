@@ -727,7 +727,7 @@ const started = performance.now();
         );
       }
     } catch (error) {
-      if (controller.signal.aborted || requestId !== analysisRequestRef.current) return;
+      if (requestId !== analysisRequestRef.current) return;
       console.warn("OmniNexus analysis fallback:", error);
 
       // IMPORTANT: analysis failure is not the same as API failure.
