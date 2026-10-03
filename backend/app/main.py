@@ -7,6 +7,7 @@ from fastapi.openapi.utils import get_openapi
 from app.api.admin import router as admin_router
 from app.api.auth import router as auth_router
 from app.api.career import router as career_router
+from app.api.future_lab import router as future_lab_router
 from app.api.health import router as health_router
 
 from app.core.config import settings
@@ -171,6 +172,15 @@ app.include_router(
 
 app.include_router(
     career_router,
+)
+
+
+# ------------------------------------------------------------
+# Future Shock Intelligence
+# ------------------------------------------------------------
+
+app.include_router(
+    future_lab_router,
 )
 
 
