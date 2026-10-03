@@ -45,12 +45,9 @@ import {
   Zap,
 } from "lucide-react";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL ||
-  (typeof window !== "undefined" &&
-  !["localhost", "127.0.0.1"].includes(window.location.hostname)
-    ? "https://omninexus-api-prod.onrender.com"
-    : "http://localhost:8001");
+import { API_BASE_URL } from "@/lib/api";
+
+const API_BASE = API_BASE_URL
 
 type ForecastRange = "7D" | "30D" | "90D" | "1Y";
 
