@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.user import User
-from app.core.security import get_current_user
+from app.core.security import get_current_user, require_admin
 
 
 router = APIRouter(
@@ -18,7 +18,7 @@ router = APIRouter(
 )
 def get_users(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_admin),
 ):
     """
     Return safe user information for the System Database Console.
