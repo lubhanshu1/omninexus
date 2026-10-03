@@ -439,6 +439,7 @@ function SectionHeader({
 ========================================================= */
 
 export default function OmniNexusDashboard() {
+  const searchParams = useSearchParams();
   /* =======================================================
      REACT FLOW
   ======================================================= */
@@ -463,6 +464,12 @@ export default function OmniNexusDashboard() {
 
   const [targetRole, setTargetRole] =
     useState("AI Engineer");
+  useEffect(() => {
+    const requestedRole = searchParams.get("role");
+    if (requestedRole && roleProfiles[requestedRole]) {
+      setTargetRole(requestedRole);
+    }
+  }, [searchParams]);
 
   const [currentSkills, setCurrentSkills] =
     useState<string[]>(["Python"]);
