@@ -351,7 +351,7 @@ def custom_openapi():
 
         "database": "SQLAlchemy",
 
-        "database_engine": "SQLite",
+        "database_engine": "PostgreSQL" if settings.DATABASE_URL.startswith(("postgres://", "postgresql://", "postgresql+psycopg://")) else "SQLite",
 
         "modules": [
             "Authentication",
