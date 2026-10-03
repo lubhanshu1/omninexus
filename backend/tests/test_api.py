@@ -114,3 +114,22 @@ def test_admin_requires_admin_role(client):
         headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == 403
+
+
+def test_all_supported_roles_are_reachable(client):
+    _, token = create_user(client)
+    headers = {"Authorization": f"Bearer {token}"}
+    roles = [
+        "AI Engineer",
+        "Data Scientist",
+        "MLOps Engineer",
+        "AI Product Engineer",
+        "Machine Learning Engineer",
+    ]
+    for role in roles:
+        response = client.post(
+            "/api/v1/analyze",
+            json={"current_skills": ["Python", "Git"], "target_role": role},
+            headers=headers,
+        )
+        assert response.status_code == 200, role
