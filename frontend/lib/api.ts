@@ -6,7 +6,7 @@ const isBrowserLocal =
 
 const isConfiguredLocalhost =
   !!configuredApiUrl &&
-  /^https?:\/\/(localhost|127\.0\.0\.1)(:\\d+)?$/i.test(
+  /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(
     configuredApiUrl.replace(/\/$/, "")
   );
 
