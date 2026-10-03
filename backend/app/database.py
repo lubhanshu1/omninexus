@@ -151,6 +151,8 @@ def ensure_database_schema() -> None:
                 )
 
         now = datetime.now(timezone.utc).isoformat()
+        conn.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS ux_users_uuid ON users(uuid)"))
+
         rows = conn.execute(text("SELECT id FROM users")).fetchall()
         for (user_id,) in rows:
             conn.execute(
