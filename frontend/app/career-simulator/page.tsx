@@ -623,8 +623,7 @@ export default function OmniNexusDashboard() {
         {
           method: "GET",
           cache: "no-store",
-          signal: controller.signal,
-        }
+}
       );
 
       const elapsed = Math.round(
@@ -663,9 +662,8 @@ export default function OmniNexusDashboard() {
   const fetchGraph = useCallback(async () => {
     const requestId = ++analysisRequestRef.current;
     setIsAnalyzing(true);
-    const controller = new AbortController();
 
-    const started = performance.now();
+const started = performance.now();
 
     try {
       const response = await fetch(
@@ -681,8 +679,7 @@ export default function OmniNexusDashboard() {
             target_role: targetRole,
           }),
           cache: "no-store",
-          signal: controller.signal,
-        }
+}
       );
 
       const elapsed = Math.round(
@@ -1047,7 +1044,6 @@ $${(marketValue / 1000).toFixed(1)}k
 Main skill gap
 ------------------
 ${bottleneck}
-
 Current Skills
 --------------
 ${currentSkills.join("\n")}
