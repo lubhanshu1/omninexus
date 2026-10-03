@@ -399,3 +399,284 @@ select,
 textarea {
   letter-spacing: -0.006em;
 }
+
+
+/* =========================================================
+   OMNINEXUS 2.0 — Intelligence OS visual system
+   Spatial graph + terminal + editorial + agent workspace.
+   ========================================================= */
+
+:root {
+  --omni-bg: #070909;
+  --omni-panel: #0b0d0d;
+  --omni-border: rgba(255,255,255,.08);
+  --omni-muted: rgba(255,255,255,.42);
+  --omni-lime: #c8ff52;
+}
+
+.omni-shell {
+  background:
+    radial-gradient(circle at 78% 4%, rgba(200,255,82,.055), transparent 24rem),
+    radial-gradient(circle at 18% 40%, rgba(255,255,255,.025), transparent 30rem),
+    #070909;
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+}
+
+.omni-noise {
+  opacity: .18;
+  background-image:
+    radial-gradient(rgba(255,255,255,.12) .5px, transparent .5px),
+    radial-gradient(rgba(200,255,82,.08) .5px, transparent .5px);
+  background-size: 19px 19px, 31px 31px;
+  background-position: 0 0, 9px 11px;
+  mask-image: linear-gradient(to bottom, black, transparent 85%);
+}
+
+.omni-topbar,
+.omni-panel {
+  border: 1px solid var(--omni-border);
+  background: rgba(11,13,13,.92);
+  box-shadow: 0 22px 70px rgba(0,0,0,.18);
+}
+
+.omni-topbar {
+  position: sticky;
+  top: 14px;
+  z-index: 50;
+  backdrop-filter: blur(18px);
+}
+
+.omni-mark {
+  border: 1px solid rgba(200,255,82,.2);
+  background: rgba(200,255,82,.055);
+  color: var(--omni-lime);
+}
+
+.omni-live {
+  border: 1px solid rgba(200,255,82,.16);
+  background: rgba(200,255,82,.035);
+  color: var(--omni-lime);
+}
+
+.omni-pulse {
+  background: var(--omni-lime);
+  box-shadow: 0 0 12px rgba(200,255,82,.75);
+  animation: omni-pulse 2s ease-in-out infinite;
+}
+
+.omni-command-trigger {
+  border: 1px solid rgba(255,255,255,.07);
+  background: rgba(255,255,255,.025);
+  transition: border-color .2s ease, background .2s ease, color .2s ease;
+}
+
+.omni-command-trigger:hover {
+  border-color: rgba(200,255,82,.2);
+  background: rgba(200,255,82,.035);
+  color: white;
+}
+
+.omni-hero {
+  min-height: 610px;
+  background:
+    linear-gradient(115deg, rgba(255,255,255,.018), transparent 45%),
+    #0a0c0c;
+}
+
+.omni-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(circle at 20% 30%, black, transparent 72%);
+}
+
+.omni-kicker {
+  display: inline-flex;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(200,255,82,.7);
+}
+
+.omni-tag {
+  border: 1px solid rgba(255,255,255,.07);
+  padding: 5px 8px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.32);
+}
+
+.omni-primary,
+.omni-secondary,
+.omni-agent-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 0 15px;
+  border: 1px solid transparent;
+  font-size: 11px;
+  font-weight: 700;
+  transition: transform .2s ease, border-color .2s ease, background .2s ease;
+}
+
+.omni-primary {
+  background: var(--omni-lime);
+  color: #090b08;
+}
+
+.omni-primary:hover {
+  transform: translateY(-1px);
+  background: #d4ff77;
+}
+
+.omni-secondary {
+  border-color: rgba(255,255,255,.1);
+  background: rgba(255,255,255,.025);
+  color: rgba(255,255,255,.65);
+}
+
+.omni-secondary:hover,
+.omni-agent-action.muted:hover {
+  border-color: rgba(200,255,82,.2);
+  background: rgba(200,255,82,.035);
+  color: white;
+}
+
+.omni-graph {
+  background: #080a0a;
+}
+
+.omni-graph-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.028) 1px, transparent 1px);
+  background-size: 38px 38px;
+  mask-image: radial-gradient(circle at center, black, transparent 78%);
+}
+
+.omni-node {
+  min-width: 88px;
+  padding: 9px 11px;
+  border: 1px solid rgba(255,255,255,.09);
+  background: rgba(10,12,12,.92);
+  box-shadow: 0 12px 30px rgba(0,0,0,.28);
+  backdrop-filter: blur(8px);
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.omni-node:hover,
+.omni-node.is-selected {
+  border-color: rgba(200,255,82,.42);
+  box-shadow: 0 0 30px rgba(200,255,82,.08);
+}
+
+.omni-node.core {
+  border-color: rgba(200,255,82,.32);
+  background: rgba(200,255,82,.06);
+}
+
+.omni-node-dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.25);
+}
+
+.omni-node.is-selected .omni-node-dot,
+.omni-node.core .omni-node-dot {
+  background: var(--omni-lime);
+  box-shadow: 0 0 10px rgba(200,255,82,.8);
+}
+
+.omni-agent-workspace {
+  min-height: 290px;
+  background:
+    linear-gradient(135deg, rgba(200,255,82,.025), transparent 45%),
+    rgba(255,255,255,.012);
+}
+
+.omni-agent-action {
+  min-height: 36px;
+  border-color: rgba(200,255,82,.18);
+  background: rgba(200,255,82,.055);
+  color: var(--omni-lime);
+}
+
+.omni-agent-action.muted {
+  border-color: rgba(255,255,255,.08);
+  background: transparent;
+  color: rgba(255,255,255,.48);
+}
+
+.omni-command-modal {
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.1);
+  background: rgba(10,12,12,.98);
+  box-shadow: 0 40px 120px rgba(0,0,0,.6);
+}
+
+@keyframes omni-pulse {
+  0%, 100% { opacity: .55; transform: scale(.9); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+@media (max-width: 1023px) {
+  .omni-shell { padding-bottom: 96px; }
+  .omni-hero { min-height: auto; }
+}
+
+html[data-theme="light"] .omni-shell {
+  background: #f5f7f4;
+  color: #11140f;
+}
+
+html[data-theme="light"] .omni-panel,
+html[data-theme="light"] .omni-topbar,
+html[data-theme="light"] .omni-command-modal {
+  background: rgba(255,255,255,.94);
+  border-color: rgba(15,23,42,.1);
+  color: #11140f;
+}
+
+html[data-theme="light"] .omni-hero {
+  background: #ffffff;
+}
+
+html[data-theme="light"] .omni-graph {
+  background: #f7f9f5;
+}
+
+html[data-theme="light"] .omni-node,
+html[data-theme="light"] .omni-agent-workspace {
+  background: rgba(255,255,255,.9);
+  border-color: rgba(15,23,42,.1);
+}
+
+html[data-theme="light"] .omni-grid,
+html[data-theme="light"] .omni-graph-grid {
+  background-image:
+    linear-gradient(rgba(15,23,42,.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15,23,42,.055) 1px, transparent 1px);
+}
+
+html[data-theme="light"] .omni-noise {
+  opacity: .08;
+}
+
+html[data-theme="light"] .omni-node .text-white,
+html[data-theme="light"] .omni-agent-workspace .text-white {
+  color: #11140f !important;
+}
+
+html[data-theme="light"] .omni-command-trigger {
+  color: rgba(15,23,42,.55);
+  border-color: rgba(15,23,42,.1);
+}
