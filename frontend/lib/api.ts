@@ -1,18 +1,30 @@
 const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
-const isLocalHost =
+
+const isBrowserLocal =
   typeof window !== "undefined" &&
   ["localhost", "127.0.0.1"].includes(window.location.hostname);
 
+const isConfiguredLocalhost =
+  !!configuredApiUrl &&
+  /^https?:\/\/(localhost|127\.0\.0\.1)(:\\d+)?$/i.test(
+    configuredApiUrl.replace(/\/$/, "")
+  );
+
+const PRODUCTION_API_URL =
+  "https://omninexus-api-prod.onrender.com";
+
 export const API_BASE_URL =
-  configuredApiUrl && configuredApiUrl.length > 0
+  configuredApiUrl &&
+  configuredApiUrl.length > 0 &&
+  (!isConfiguredLocalhost || isBrowserLocal)
     ? configuredApiUrl.replace(/\/$/, "")
-    : isLocalHost
+    : isBrowserLocal
       ? "http://localhost:8001"
-      : "";
+      : PRODUCTION_API_URL;
 
 export const apiUrl = (path: string) => {
   if (!API_BASE_URL) {
-    throw new Error("NEXT_PUBLIC_API_URL is not configured for this deployment.");
+    throw new Error("OmniNexus API URL is not configured.");
   }
   return `${API_BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 };
