@@ -80,7 +80,7 @@ class User(Base):
     last_active = Column(
         String(100),
         nullable=False,
-        default="Just now",
+        default=lambda: datetime.now(timezone.utc).isoformat(),
     )
 
     # ========================================================
