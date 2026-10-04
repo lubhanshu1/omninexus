@@ -126,6 +126,21 @@ Core capabilities:
 )
 
 
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    """Return a JSON error with CORS headers instead of a browser-level CORS failure."""
+    origin = request.headers.get("origin")
+    headers = {}
+    if origin and origin in settings.CORS_ORIGINS:
+        headers["Access-Control-Allow-Origin"] = origin
+        headers["Vary"] = "Origin"
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error."},
+        headers=headers,
+    )
+
+
 @app.middleware("http")
 async def request_size_guard(request: Request, call_next):
     content_length = request.headers.get("content-length")
