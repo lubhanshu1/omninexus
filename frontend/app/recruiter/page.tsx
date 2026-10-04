@@ -843,7 +843,7 @@ export default function RecruiterDashboard() {
     if (!selectedCandidate) return;
     dialogRef.current?.focus();
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") closeCandidateGraph();
+      if (event.key === "Escape") { setSelectedCandidate(null); setSelectedSkill(null); setShowSkillIntelligence(false); setSkillSimulation([]); setGraphZoom(1); setGraphFullscreen(false); }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
