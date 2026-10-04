@@ -81,6 +81,7 @@ const ROLE_REQUIREMENTS: Record<string, string[]> = {
     "Data Analysis",
     "Machine Learning",
     "Pandas",
+    "Statistics",
   ],
   "MLOps Engineer": [
     "Python",
@@ -90,6 +91,20 @@ const ROLE_REQUIREMENTS: Record<string, string[]> = {
     "CI/CD",
     "Cloud Computing",
     "AWS",
+  ],
+  "AI Product Engineer": [
+    "Python",
+    "LLMs",
+    "RAG",
+    "AI Agents",
+    "Cloud Computing",
+  ],
+  "Machine Learning Engineer": [
+    "Python",
+    "Machine Learning",
+    "Deep Learning",
+    "PyTorch",
+    "MLOps",
   ],
 };
 
@@ -952,7 +967,7 @@ export default function RecruiterDashboard() {
                   className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400"
                 />
 
-                <input
+                <input aria-label="Candidate role search"
                   value={roleQuery}
                   onChange={(e) =>
                     setRoleQuery(e.target.value)
@@ -968,7 +983,7 @@ export default function RecruiterDashboard() {
 
               </div>
 
-              <select
+              <select aria-label="Target role"
                 value={role}
                 onChange={(e) => {
                   setRole(e.target.value);
@@ -1078,16 +1093,13 @@ export default function RecruiterDashboard() {
 
             </div>
 
-            <textarea
+            <textarea aria-label="Resume text"
               value={resumeText}
               onChange={(e) =>
                 setResumeText(e.target.value)
               }
               className="w-full h-32 resize-none bg-[#050a11] border border-slate-800 rounded-xl p-4 text-sm text-slate-300 outline-none focus:border-indigo-500 transition"
-              placeholder="Paste resume text here...
-
-Example:
-Computer Science student with experience in Python, SQL, Pandas, NumPy, Machine Learning, Data Analysis, AWS, Docker and PyTorch."
+              placeholder={"Paste resume text here...\n\nExample:\nComputer Science student with experience in Python, SQL, Pandas, Machine Learning, Data Analysis, AWS, Docker and PyTorch."}
             />
 
             <div className="flex flex-col sm:flex-row gap-3 mt-3">
@@ -1118,16 +1130,42 @@ Computer Science student with experience in Python, SQL, Pandas, NumPy, Machine 
 
               <label className="px-5 py-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition cursor-pointer flex items-center justify-center gap-2">
                 <Upload size={15} />
-                Upload TXT
-                <input
+                Upload Resume
+                <input aria-label="Resume file upload"
                   type="file"
-                  accept=".txt,.md,.csv,.json"
+                  accept=".txt,.md,.csv,.json,.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                   className="hidden"
                   onChange={async (event) => {
                     const file = event.target.files?.[0];
+                    event.target.value = "";
                     if (!file) return;
-                    const content = await file.text();
-                    setResumeText(content);
+                    if (file.size > 5_000_000) {
+                      setParseError("Resume file must be 5 MB or smaller.");
+                      return;
+                    }
+                    setParseError("");
+                    setParsingResume(true);
+                    try {
+                      const formData = new FormData();
+                      formData.append("file", file);
+                      const response = await fetch(
+                        \`${API_BASE}/api/v1/parse-resume-file\`,
+                        {
+                          method: "POST",
+                          headers: authHeaders(),
+                          body: formData,
+                        },
+                      );
+                      const data = await response.json().catch(() => ({}));
+                      if (!response.ok) {
+                        throw new Error(data.detail || "Could not read this resume file.");
+                      }
+                      setResumeText(String(data.resume_text || ""));
+                    } catch (error) {
+                      setParseError(error instanceof Error ? error.message : "Could not read this resume file.");
+                    } finally {
+                      setParsingResume(false);
+                    }
                   }}
                 />
               </label>
@@ -1970,7 +2008,7 @@ Computer Science student with experience in Python, SQL, Pandas, NumPy, Machine 
 
               <div className="mt-4 bg-[#050a11] border border-slate-800 rounded-xl p-5">
                 <div className="flex items-center gap-2 mb-3"><MessageSquareText size={15} className="text-indigo-400" /><div><p className="text-xs font-black text-white">Recruiter Decision Notes</p><p className="text-[9px] text-slate-600 mt-0.5">Saved locally in this browser session.</p></div></div>
-                <textarea value={recruiterNote} onChange={(e) => setRecruiterNote(e.target.value)} placeholder="Add private notes about evidence, interview follow-up, role fit or next action..." className="w-full min-h-[88px] resize-none rounded-xl bg-[#080e17] border border-slate-800 p-3 text-xs text-slate-300 placeholder:text-slate-700 outline-none focus:border-indigo-500/60" />
+                <textarea aria-label="Recruiter note" value={recruiterNote} onChange={(e) => setRecruiterNote(e.target.value)} placeholder="Add private notes about evidence, interview follow-up, role fit or next action..." className="w-full min-h-[88px] resize-none rounded-xl bg-[#080e17] border border-slate-800 p-3 text-xs text-slate-300 placeholder:text-slate-700 outline-none focus:border-indigo-500/60" />
               </div>
 
               <div className="flex flex-wrap justify-end gap-2 mt-5 pt-4 border-t border-slate-800">
