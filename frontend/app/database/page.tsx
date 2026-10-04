@@ -1091,11 +1091,11 @@ export default function DatabaseView() {
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600"
                   />
 
-                  <input aria-label="Search users"
+                  <input
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
                     placeholder="Search identity..."
-                    aria-label="Search identities"
+                    aria-label="Search users"
                     className="w-full sm:w-72 rounded-xl border border-slate-800 bg-[#060d16] py-3 pl-10 pr-10 text-sm text-white outline-none placeholder:text-slate-700 focus:border-cyan-500/40"
                   />
 
