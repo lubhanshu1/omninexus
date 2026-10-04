@@ -133,3 +133,49 @@ def test_all_supported_roles_are_reachable(client):
             headers=headers,
         )
         assert response.status_code == 200, role
+
+
+def test_career_analysis_normalizes_role_and_rejects_unknown_target(client):
+    _, token = create_user(client)
+    headers = {"Authorization": f"Bearer {token}"}
+
+    normalized = client.post(
+        "/api/v1/analyze",
+        json={"current_skills": ["Python"], "target_role": "ai engineer"},
+        headers=headers,
+    )
+    assert normalized.status_code == 200
+
+    unknown = client.post(
+        "/api/v1/analyze",
+        json={"current_skills": ["Python"], "target_role": "Docker"},
+        headers=headers,
+    )
+    assert unknown.status_code == 404
+
+
+def test_logout_revokes_token(client):
+    _, token = create_user(client)
+    headers = {"Authorization": f"Bearer {token}"}
+
+    logout = client.post("/api/v1/auth/logout", headers=headers)
+    assert logout.status_code == 200
+
+    me = client.get("/api/v1/auth/me", headers=headers)
+    assert me.status_code == 401
+
+
+def test_admin_endpoint_rejects_non_admin(client):
+    email, token = create_user(client)
+    headers = {"Authorization": f"Bearer {token}"}
+    response = client.get("/api/v1/admin/users", headers=headers)
+    assert response.status_code == 403
+    assert email
+
+
+def test_password_rejects_nul(client):
+    response = client.post(
+        "/api/v1/auth/signup",
+        json={"email": unique_email(), "password": "Strong\u0000Pass123!"},
+    )
+    assert response.status_code == 422
