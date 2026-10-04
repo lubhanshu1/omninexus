@@ -286,7 +286,7 @@ export default function Login() {
 
         const timeout = window.setTimeout(() => {
           controller.abort();
-        }, 10000);
+        }, 20000);
 
         const response = await fetch(
           HEALTH_ENDPOINT,
@@ -356,7 +356,7 @@ export default function Login() {
           err.name === "AbortError"
         ) {
           setHealthMessage(
-            "API connection timed out"
+            "API is waking up. Retrying automatically..."
           );
         } else if (err instanceof Error) {
           setHealthMessage(
