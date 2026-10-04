@@ -301,6 +301,9 @@ async def system_status(db=Depends(get_db)):
             "health": "online",
             "admin": "online",
         },
+        "checks": {
+            "database_query": database_status == "online",
+        },
     }
 
 
