@@ -10,6 +10,7 @@ const isConfiguredLocalhost =
     configuredApiUrl.replace(/\/$/, "")
   );
 
+// Production deployments always use the Render API; local development can use localhost.
 const PRODUCTION_API_URL =
   "https://omninexus-api-prod.onrender.com";
 
