@@ -10,6 +10,17 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(pathname === "/login");
 
   useEffect(() => {
+    const titles: Record<string, string> = {
+      "/": "OmniNexus OS — Command Center",
+      "/login": "OmniNexus OS — Sign In",
+      "/career-simulator": "OmniNexus OS — Career Simulator",
+      "/recruiter": "OmniNexus OS — Talent Matcher",
+      "/observatory": "OmniNexus OS — Workforce Observatory",
+      "/database": "OmniNexus OS — System Database",
+      "/future-lab": "OmniNexus OS — Future Lab",
+    };
+    document.title = titles[pathname] || "OmniNexus OS";
+
     if (pathname === "/login") {
       setReady(true);
       return;
