@@ -830,7 +830,7 @@ export default function Observatory() {
                     className="w-full appearance-none rounded-xl border border-slate-700 bg-[#0b1420] py-3.5 pl-11 pr-10 text-sm font-bold text-white outline-none transition focus:border-cyan-500/50"
                   >
                     <option>AI Engineer</option>
-                    <option>ML Engineer</option>
+                    <option>Machine Learning Engineer</option>
                     <option>Data Scientist</option>
                     <option>MLOps Engineer</option>
                     <option>AI Product Engineer</option>
