@@ -2045,57 +2045,8 @@ export default function RecruiterDashboard() {
         <button onClick={resetRecruiterWorkspace} className="px-5 py-2.5 rounded-xl bg-rose-950/30 border border-rose-900/50 text-[10px] font-black uppercase tracking-wider text-rose-400 hover:bg-rose-950/60 transition">Reset Recruiter Workspace</button>
       </div>
 
-      {/* =======================================================
-          BOTTOM SYSTEM BAR
-      ======================================================= */}
+      {/* Global navigation is provided by FloatingNav. */}
 
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-24px)] max-w-5xl">
-
-        <div className="bg-[#0b1422]/95 backdrop-blur-xl border border-slate-700/80 rounded-2xl shadow-2xl p-2 flex items-center justify-between gap-2">
-
-          <button
-            onClick={() =>
-              router.push("/")
-            }
-            className="px-5 py-3 rounded-xl text-xs font-black text-slate-500 hover:text-white transition"
-          >
-            Career Simulator
-          </button>
-
-          <button
-            className="px-5 py-3 rounded-xl bg-indigo-600 text-white text-xs font-black shadow-[0_0_20px_rgba(99,102,241,0.25)]"
-          >
-            Talent Matcher
-          </button>
-
-          <button
-            onClick={() =>
-              router.push("/observatory")
-            }
-            className="px-5 py-3 rounded-xl text-xs font-black text-slate-500 hover:text-white transition hidden sm:block"
-          >
-            Observatory
-          </button>
-
-          <button
-            onClick={() =>
-              router.push("/database")
-            }
-            className="px-5 py-3 rounded-xl text-xs font-black text-slate-500 hover:text-white transition hidden sm:block"
-          >
-            System DB
-          </button>
-
-          <div className="hidden md:flex items-center gap-2 px-4 text-[10px] font-bold text-slate-600">
-            <Server size={13} />
-            {backendOnline
-              ? "SYSTEM ONLINE"
-              : "OFFLINE"}
-          </div>
-
-        </div>
-
-      </div>
     </div>
   );
 }
