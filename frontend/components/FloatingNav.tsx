@@ -176,6 +176,8 @@ export default function FloatingNav() {
             flex
             min-w-0
             flex-1
+            overflow-x-auto
+            scrollbar-none
             items-center
             justify-center
             gap-1
@@ -212,8 +214,9 @@ export default function FloatingNav() {
                   rounded-xl
 
                   px-2
-                  sm:px-4
+                  md:px-4
                   lg:px-5
+                  shrink-0
 
                   text-[11px]
                   sm:text-xs
@@ -260,15 +263,8 @@ export default function FloatingNav() {
                 {/* =================================================
                     DESKTOP / TABLET LABEL
                 ================================================= */}
-                <span className="hidden sm:inline">
+                <span className="hidden md:inline">
                   {item.name}
-                </span>
-
-                {/* =================================================
-                    MOBILE LABEL
-                ================================================= */}
-                <span className="inline sm:hidden">
-                  {item.shortName}
                 </span>
 
                 {/* =================================================
@@ -396,7 +392,7 @@ export default function FloatingNav() {
             strokeWidth={2}
           />
 
-          <span className="hidden sm:inline">
+          <span className="hidden md:inline">
             Logout
           </span>
         </button>
