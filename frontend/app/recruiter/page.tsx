@@ -875,7 +875,7 @@ export default function RecruiterDashboard() {
    */
 
   return (
-    <div className="min-h-screen bg-[#050a11] text-slate-300 font-sans pb-28">
+    <main className="min-h-screen bg-[#050a11] text-slate-300 font-sans pb-28" aria-label="Recruiter talent intelligence workspace">
       <div className="max-w-[1500px] mx-auto p-5 md:p-8">
 
         {/* =====================================================
@@ -2047,6 +2047,6 @@ export default function RecruiterDashboard() {
 
       {/* Global navigation is provided by FloatingNav. */}
 
-    </div>
+    </main>
   );
 }
