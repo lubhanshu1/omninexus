@@ -931,7 +931,7 @@ export default function Observatory() {
             ))}
 
             <div className="ml-auto hidden text-[9px] font-bold uppercase tracking-widest text-slate-600 md:block">
-              LIVE INTELLIGENCE / {target}
+              INTELLIGENCE SNAPSHOT / {target}
             </div>
           </section>
 
@@ -1404,7 +1404,7 @@ export default function Observatory() {
               action={
                 <div className="flex items-center gap-2">
                   <span className="hidden text-[9px] text-slate-600 sm:block">
-                    LIVE GRAPH
+                    GRAPH SNAPSHOT
                   </span>
                   <button
                     onClick={() => askCopilot("Explain the workforce capability graph for this destination role.")}
@@ -2021,7 +2021,7 @@ export default function Observatory() {
                   </div>
                   <div className="flex items-center gap-2 text-[9px] text-emerald-400">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                    Knowledge graph connected
+                    Knowledge graph snapshot connected
                   </div>
                 </div>
               </div>
@@ -2040,7 +2040,7 @@ export default function Observatory() {
                 <div className="mb-2 flex items-center gap-2">
                   <Sparkles size={14} className="text-cyan-400" />
                   <span className="text-[9px] font-black uppercase tracking-widest text-cyan-400">
-                    Live AI Analysis
+                    Graph Analysis Snapshot
                   </span>
                 </div>
 
@@ -2062,7 +2062,7 @@ export default function Observatory() {
                     }`}
                 >
                   <div className="mb-2 text-[8px] font-black uppercase tracking-widest text-slate-600">
-                    {message.role === "user" ? "You" : "OmniNexus AI"}
+                    {message.role === "user" ? "You" : "OmniNexus Graph Copilot"}
                   </div>
                   <p className="text-[11px] leading-5 text-slate-400">
                     {message.text}
