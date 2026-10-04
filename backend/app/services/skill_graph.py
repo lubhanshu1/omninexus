@@ -28,6 +28,14 @@ SKILL_GRAPH_NODES = {
     "Machine Learning Engineer": {"val": 0},
 }
 
+ROLE_NODES = {
+    "AI Engineer",
+    "Data Scientist",
+    "MLOps Engineer",
+    "AI Product Engineer",
+    "Machine Learning Engineer",
+}
+
 SKILL_GRAPH_EDGES = [
     ("Python", "Data Analysis"),
     ("SQL", "Data Analysis"),
