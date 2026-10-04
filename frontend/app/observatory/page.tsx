@@ -487,6 +487,7 @@ export default function Observatory() {
 
               <button
                 onClick={() => setMobileNav(false)}
+                aria-label="Close navigation menu"
                 className="rounded-lg p-2 text-slate-500 hover:bg-slate-800 hover:text-white"
               >
                 <X size={18} />
@@ -560,6 +561,7 @@ export default function Observatory() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => setMobileNav(true)}
+              aria-label="Open navigation menu"
               className="rounded-lg border border-slate-800 p-2 text-slate-400 md:hidden"
             >
               <Menu size={18} />
@@ -583,6 +585,7 @@ export default function Observatory() {
           <div className="flex items-center gap-2 sm:gap-4">
             <button
               onClick={() => setNotifications((v) => !v)}
+              aria-label="Toggle notifications"
               className="relative rounded-xl border border-slate-800 bg-slate-900/50 p-2.5 text-slate-400 transition hover:border-slate-700 hover:text-white"
             >
               <Bell size={16} />
@@ -591,6 +594,7 @@ export default function Observatory() {
 
             <button
               onClick={handleRefresh}
+              aria-label="Refresh intelligence"
               className="rounded-xl border border-slate-800 bg-slate-900/50 p-2.5 text-slate-400 transition hover:border-slate-700 hover:text-white"
             >
               <RefreshCw
@@ -723,6 +727,7 @@ export default function Observatory() {
               <div className="font-black text-white">Intelligence Alerts</div>
               <button
                 onClick={() => setNotifications(false)}
+                aria-label="Close notifications"
                 className="text-slate-500 hover:text-white"
               >
                 <X size={15} />
@@ -2023,6 +2028,7 @@ export default function Observatory() {
 
               <button
                 onClick={() => setCopilotOpen(false)}
+                aria-label="Close Intelligence Copilot"
                 className="rounded-lg p-2 text-slate-500 hover:bg-slate-800 hover:text-white"
               >
                 <X size={17} />
@@ -2129,6 +2135,7 @@ export default function Observatory() {
                   type="button"
                   onClick={() => askCopilot()}
                   disabled={!copilotInput.trim()}
+                  aria-label="Send copilot question"
                   className="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-400 text-[#041018] transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-30"
                   title="Send query"
                 >
