@@ -819,7 +819,7 @@ export default function Observatory() {
                     className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-400"
                   />
 
-                  <select
+                  <select aria-label="Observatory analysis target"
                     value={target}
                     onChange={(e) => setTarget(e.target.value)}
                     className="w-full appearance-none rounded-xl border border-slate-700 bg-[#0b1420] py-3.5 pl-11 pr-10 text-sm font-bold text-white outline-none transition focus:border-cyan-500/50"
@@ -1690,7 +1690,7 @@ export default function Observatory() {
                     </div>
                   </div>
 
-                  <input
+                  <input aria-label="Market demand scenario"
                     type="range"
                     min="0"
                     max="50"
@@ -2111,7 +2111,7 @@ export default function Observatory() {
 
             <div className="border-t border-slate-800 p-4">
               <div className="flex items-center gap-2 rounded-xl border border-slate-800 bg-[#050a10] p-2">
-                <input
+                <input aria-label="Copilot question"
                   value={copilotInput}
                   onChange={(e) => setCopilotInput(e.target.value)}
                   onKeyDown={(e) => {
