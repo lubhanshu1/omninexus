@@ -301,7 +301,7 @@ export default function HomePage() {
 
 
         {/* =========================================================
-            LIVE METRICS
+            SNAPSHOT METRICS
         ========================================================== */}
 
         <section className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -324,7 +324,7 @@ export default function HomePage() {
             icon={Users}
             label="Talent Supply"
             value="+3.4%"
-            change="LIVE"
+            change="SNAPSHOT"
           />
 
           <MetricCard
