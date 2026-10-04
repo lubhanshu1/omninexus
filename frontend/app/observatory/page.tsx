@@ -2117,7 +2117,7 @@ export default function Observatory() {
 
             <div className="border-t border-slate-800 p-4">
               <div className="flex items-center gap-2 rounded-xl border border-slate-800 bg-[#050a10] p-2">
-                <input aria-label="Copilot question"
+                <input
                   value={copilotInput}
                   onChange={(e) => setCopilotInput(e.target.value)}
                   onKeyDown={(e) => {
@@ -2128,7 +2128,7 @@ export default function Observatory() {
                   }}
                   placeholder="Ask the intelligence layer anything..."
                   className="flex-1 bg-transparent px-2 py-2 text-xs text-white outline-none placeholder:text-slate-700"
-                  aria-label="Ask OmniNexus Intelligence Copilot"
+                  aria-label="Copilot question"
                 />
 
                 <button

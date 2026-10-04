@@ -212,6 +212,7 @@ export default function RecruiterDashboard() {
 
   const [analyzing, setAnalyzing] = useState(false);
   const [parsingResume, setParsingResume] = useState(false);
+  const [parseError, setParseError] = useState("");
   const [backendOnline, setBackendOnline] = useState(false);
 
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
