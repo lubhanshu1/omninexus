@@ -8,14 +8,7 @@ load_dotenv()
 
 class Settings:
     def __init__(self) -> None:
-        database_url = os.getenv("DATABASE_URL")
-        if not database_url:
-            if os.getenv("ENVIRONMENT", "development").strip().lower() == "production":
-                raise RuntimeError(
-                    "DATABASE_URL must be set in production. Use a managed PostgreSQL database."
-                )
-            database_url = "sqlite:///./omninexus.db"
-        self.DATABASE_URL = database_url
+        self.DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./omninexus.db")
 
         jwt_secret = os.getenv("JWT_SECRET_KEY")
         if not jwt_secret:
