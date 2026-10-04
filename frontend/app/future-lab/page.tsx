@@ -222,7 +222,7 @@ export default function FutureLabPage() {
 
             <div className="border-t border-slate-800 bg-[#09131e] p-6 lg:border-l lg:border-t-0 md:p-8">
               <label className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-600">Target role</label>
-              <select value={role} onChange={(event) => setRole(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-700 bg-[#07101a] px-3 py-3 text-sm font-bold text-white outline-none focus:border-cyan-500/50">
+              <select aria-label="Future Lab target role" value={role} onChange={(event) => setRole(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-700 bg-[#07101a] px-3 py-3 text-sm font-bold text-white outline-none focus:border-cyan-500/50">
                 {Object.keys(roleProfiles).map((item) => <option key={item}>{item}</option>)}
               </select>
 
@@ -231,7 +231,7 @@ export default function FutureLabPage() {
                   <label className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-600">Demand shock</label>
                   <span className="text-xs font-black text-amber-400">+{demandShock}%</span>
                 </div>
-                <input type="range" min="0" max="50" step="5" value={demandShock} onChange={(event) => setDemandShock(Number(event.target.value))} className="w-full accent-cyan-400" />
+                <input aria-label="Demand shock percentage" type="range" min="0" max="50" step="5" value={demandShock} onChange={(event) => setDemandShock(Number(event.target.value))} className="w-full accent-cyan-400" />
                 <div className="mt-1 flex justify-between text-[8px] text-slate-700"><span>BASELINE</span><span>+50%</span></div>
               </div>
 
@@ -240,7 +240,7 @@ export default function FutureLabPage() {
                   <label className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-600">Reskill workforce</label>
                   <span className="text-xs font-black text-emerald-400">{reskill} people</span>
                 </div>
-                <input type="range" min="0" max="30" step="1" value={reskill} onChange={(event) => setReskill(Number(event.target.value))} className="w-full accent-emerald-400" />
+                <input aria-label="Reskilling cohort" type="range" min="0" max="30" step="1" value={reskill} onChange={(event) => setReskill(Number(event.target.value))} className="w-full accent-emerald-400" />
                 <div className="mt-1 flex justify-between text-[8px] text-slate-700"><span>NONE</span><span>30 PEOPLE</span></div>
               </div>
             </div>
