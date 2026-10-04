@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Activity,
@@ -246,6 +246,7 @@ export default function RecruiterDashboard() {
   const [graphZoom, setGraphZoom] = useState(1);
   const [graphFullscreen, setGraphFullscreen] = useState(false);
   const [recruiterNote, setRecruiterNote] = useState("");
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   /*
    * ------------------------------------------------------------
@@ -837,6 +838,16 @@ export default function RecruiterDashboard() {
     setGraphZoom(1);
     setGraphFullscreen(false);
   };
+
+  useEffect(() => {
+    if (!selectedCandidate) return;
+    dialogRef.current?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeCandidateGraph();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [selectedCandidate]);
 
   /*
    * ------------------------------------------------------------
@@ -1786,8 +1797,14 @@ export default function RecruiterDashboard() {
         <div
           className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 md:p-6"
           onClick={closeCandidateGraph}
+          role="presentation"
         >
           <div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Candidate talent graph"
+            tabIndex={-1}
             className={`relative w-full ${graphFullscreen ? "max-w-[1500px]" : "max-w-6xl"} max-h-[94vh] bg-[#070d16] border border-slate-700/80 rounded-2xl shadow-[0_30px_120px_rgba(0,0,0,0.65)] overflow-hidden`}
             onClick={(e) => e.stopPropagation()}
           >
