@@ -1149,7 +1149,7 @@ export default function RecruiterDashboard() {
                       const formData = new FormData();
                       formData.append("file", file);
                       const response = await fetch(
-                        \`${API_BASE}/api/v1/parse-resume-file\`,
+                        `${API_BASE}/api/v1/parse-resume-file`,
                         {
                           method: "POST",
                           headers: authHeaders(),
