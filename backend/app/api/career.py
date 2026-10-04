@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from io import BytesIO
+
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from app.models.user import User
 from app.core.security import get_current_user
 from app.schemas.career import GraphRequest, ResumeRequest
@@ -13,6 +15,77 @@ router = APIRouter(prefix="/api/v1", tags=["career"])
 def parse_resume(request: ResumeRequest, current_user: User = Depends(get_current_user)):
     extracted_skills = extract_skills_from_resume(request.resume_text)
     return {"status": "success", "extracted_skills": extracted_skills}
+
+
+@router.post("/parse-resume-file", summary="Extract text from a resume file")
+async def parse_resume_file(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+):
+    allowed_types = {
+        "text/plain": "text",
+        "text/markdown": "text",
+        "text/csv": "text",
+        "application/json": "text",
+        "application/pdf": "pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
+    }
+    filename = (file.filename or "").lower()
+    extension = filename.rsplit(".", 1)[-1] if "." in filename else ""
+    extension_types = {
+        "txt": "text",
+        "md": "text",
+        "csv": "text",
+        "json": "text",
+        "pdf": "pdf",
+        "docx": "docx",
+    }
+    kind = extension_types.get(extension) or allowed_types.get(file.content_type or "")
+    if kind is None:
+        raise HTTPException(
+            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            detail="Unsupported resume format. Use TXT, MD, CSV, JSON, PDF or DOCX.",
+        )
+
+    payload = await file.read()
+    if len(payload) > 5_000_000:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail="Resume file must be 5 MB or smaller.",
+        )
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Resume file is empty.",
+        )
+
+    try:
+        if kind == "text":
+            text_content = payload.decode("utf-8-sig")
+        elif kind == "pdf":
+            from pypdf import PdfReader
+            reader = PdfReader(BytesIO(payload))
+            text_content = "\n".join(page.extract_text() or "" for page in reader.pages)
+        else:
+            from docx import Document
+            document = Document(BytesIO(payload))
+            text_content = "\n".join(paragraph.text for paragraph in document.paragraphs)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Could not extract readable text from this resume file.",
+        ) from exc
+
+    text_content = text_content.strip()
+    if not text_content:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="No readable text was found in the resume file.",
+        )
+    if len(text_content) > 20_000:
+        text_content = text_content[:20_000]
+
+    return {"status": "success", "filename": file.filename, "resume_text": text_content}
 
 
 @router.post("/analyze", summary="Analyze a user's skill graph against a target role")
