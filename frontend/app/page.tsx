@@ -65,21 +65,21 @@ const modules = [
     href: "/database",
     icon: Database,
     accent: "amber",
-    metric: "840K+",
-    metricLabel: "Graph nodes",
+    metric: "21+",
+    metricLabel: "Graph nodes (current taxonomy)",
   },
 ] as const;
 
 const systemSignals = [
   {
     name: "Graph API",
-    value: "99.98%",
+    value: "Demo snapshot",
     status: "Operational",
     icon: Network,
   },
   {
     name: "Market Intelligence",
-    value: "98.7%",
+    value: "Demo snapshot",
     status: "Connected",
     icon: TrendingUp,
   },
@@ -147,7 +147,7 @@ export default function HomePage() {
             </div>
 
             <div className="hidden rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-2.5 text-xs text-slate-400 sm:block">
-              LIVE GRAPH / AI ENGINE
+              DEMO SNAPSHOT GRAPH / AI ENGINE
             </div>
 
           </div>
@@ -274,7 +274,7 @@ export default function HomePage() {
 
                   <TelemetryRow
                     label="System Sync"
-                    value="100%"
+                    value="Demo snapshot"
                     width="100%"
                   />
 
@@ -329,7 +329,7 @@ export default function HomePage() {
 
           <MetricCard
             icon={Target}
-            label="Market Signal"
+            label="Market Signal (demo)"
             value="+6.1%"
             change="ACTIVE"
           />
@@ -547,7 +547,7 @@ export default function HomePage() {
 
           <span className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-            ALL CORE SERVICES OPERATIONAL
+            CORE MODULES AVAILABLE
           </span>
 
         </footer>
