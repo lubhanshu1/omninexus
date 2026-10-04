@@ -399,3 +399,45 @@ select,
 textarea {
   letter-spacing: -0.006em;
 }
+
+
+/* =========================================================
+   Accessibility hardening
+   ========================================================= */
+
+/* Hide horizontal scrollbars while preserving touch scrolling. */
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Raise microcopy to a readable floor. Decorative icons are unaffected. */
+[class*="text-[6px]"],
+[class*="text-[7px]"],
+[class*="text-[8px]"],
+[class*="text-[9px]"] {
+  font-size: 0.6875rem !important;
+  line-height: 1.35 !important;
+}
+
+/* Improve dark-theme text contrast on the graphite surfaces. */
+html:not([data-theme="light"]) [class*="text-slate-500"] {
+  color: #94a3b8 !important;
+}
+html:not([data-theme="light"]) [class*="text-slate-600"] {
+  color: #94a3b8 !important;
+}
+html:not([data-theme="light"]) [class*="text-slate-700"] {
+  color: #64748b !important;
+}
+
+/* Keep the light theme comfortably readable too. */
+html[data-theme="light"] [class*="text-slate-500"],
+html[data-theme="light"] [class*="text-slate-600"] {
+  color: #475569 !important;
+}
+html[data-theme="light"] [class*="text-slate-700"] {
+  color: #334155 !important;
+}
