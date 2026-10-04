@@ -1816,6 +1816,7 @@ export default function RecruiterDashboard() {
                 </button>
                 <button
                   onClick={closeCandidateGraph}
+                  aria-label="Close candidate graph"
                   className="w-9 h-9 rounded-lg bg-slate-900 border border-slate-800 text-slate-500 hover:text-white flex items-center justify-center transition"
                 >
                   <X size={17} />
@@ -1854,9 +1855,9 @@ export default function RecruiterDashboard() {
                   <p className="text-[9px] text-slate-600 mt-1">Current capabilities → structural gaps → target role. Click nodes for intelligence.</p>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <button onClick={() => setGraphZoom((v) => Math.max(0.75, Number((v - 0.1).toFixed(1))))} className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 text-slate-500 hover:text-white flex items-center justify-center"><Minus size={13} /></button>
+                  <button aria-label="Zoom out candidate graph" onClick={() => setGraphZoom((v) => Math.max(0.75, Number((v - 0.1).toFixed(1))))} className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 text-slate-500 hover:text-white flex items-center justify-center"><Minus size={13} /></button>
                   <span className="min-w-[48px] text-center text-[9px] text-slate-500 font-mono">{Math.round(graphZoom * 100)}%</span>
-                  <button onClick={() => setGraphZoom((v) => Math.min(1.4, Number((v + 0.1).toFixed(1))))} className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 text-slate-500 hover:text-white flex items-center justify-center"><Plus size={13} /></button>
+                  <button aria-label="Zoom in candidate graph" onClick={() => setGraphZoom((v) => Math.min(1.4, Number((v + 0.1).toFixed(1))))} className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 text-slate-500 hover:text-white flex items-center justify-center"><Plus size={13} /></button>
                   <button onClick={() => setGraphZoom(1)} className="px-2.5 h-8 rounded-lg bg-slate-900 border border-slate-800 text-[9px] font-bold text-slate-500 hover:text-white">Reset</button>
                 </div>
               </div>
@@ -1933,7 +1934,7 @@ export default function RecruiterDashboard() {
                         <h3 className="text-xl font-black text-white mt-2">{selectedSkill}</h3>
                         <p className="text-xs text-slate-500 mt-2 max-w-3xl">{intel.description}</p>
                       </div>
-                      <button onClick={() => setShowSkillIntelligence(false)} className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 text-slate-500 hover:text-white flex items-center justify-center"><X size={14} /></button>
+                      <button aria-label="Close skill intelligence" onClick={() => setShowSkillIntelligence(false)} className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 text-slate-500 hover:text-white flex items-center justify-center"><X size={14} /></button>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
