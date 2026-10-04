@@ -30,7 +30,7 @@ class Settings:
 
         cors_value = os.getenv(
             "CORS_ORIGINS",
-            "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001,https://omninexus.vercel.app",
+            "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001,https://omninexus.vercel.app,https://omninexus-9w2l.vercel.app",
         )
         self.CORS_ORIGINS: List[str] = [
             origin.strip() for origin in cors_value.split(",") if origin.strip()
