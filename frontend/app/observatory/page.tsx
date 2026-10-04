@@ -1136,7 +1136,7 @@ export default function Observatory() {
                       All systems operational
                     </span>
                   </div>
-                  <span className="text-[9px] text-slate-600">LIVE</span>
+                  <span className="text-[9px] text-slate-600">SNAPSHOT</span>
                 </div>
               </div>
             </div>
