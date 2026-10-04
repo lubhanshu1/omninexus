@@ -20,4 +20,5 @@ def health_check(db: Session = Depends(get_db)):
     return {
         "status": "healthy",
         "service": "OmniNexus Intelligence API",
+        "database": "online",
     }
