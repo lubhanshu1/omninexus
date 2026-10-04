@@ -41,3 +41,5 @@ export const authHeaders = (): Record<string, string> => {
     ? { Authorization: `Bearer ${token}` }
     : {};
 };
+
+// Final bug-fix deployment trigger: keep Vercel aligned with the hardened main branch.
