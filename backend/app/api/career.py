@@ -4,6 +4,7 @@ from app.core.security import get_current_user
 from app.schemas.career import GraphRequest, ResumeRequest
 from app.services.career_engine import analyze_career_path
 from app.services.resume_service import extract_skills_from_resume
+from app.services.skill_graph import ROLE_NODES
 
 router = APIRouter(prefix="/api/v1", tags=["career"])
 
