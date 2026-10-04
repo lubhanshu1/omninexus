@@ -8,6 +8,8 @@ class LoginRequest(BaseModel):
     @field_validator("password")
     @classmethod
     def validate_password_bytes(cls, value: str) -> str:
+        if "\x00" in value:
+            raise ValueError("Password cannot contain NUL characters.")
         if len(value.encode("utf-8")) > 72:
             raise ValueError("Password must be at most 72 UTF-8 bytes.")
         return value
