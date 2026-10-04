@@ -6,7 +6,6 @@ from app.core.security import get_current_user
 from app.schemas.career import GraphRequest, ResumeRequest
 from app.services.career_engine import analyze_career_path
 from app.services.resume_service import extract_skills_from_resume
-from app.services.skill_graph import ROLE_NODES
 
 router = APIRouter(prefix="/api/v1", tags=["career"])
 
@@ -95,12 +94,13 @@ def analyze_path(request: GraphRequest, current_user: User = Depends(get_current
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=result["message"])
 
     shortest_path = result["shortest_path"]
+    current_skill_set = set(result.get("current_skills", []))
     flow_nodes, flow_edges = [], []
     x_pos = 50
 
     for idx, node in enumerate(shortest_path):
-        is_current = node in request.current_skills
-        is_target = node == request.target_role
+        is_current = node in current_skill_set
+        is_target = node == shortest_path[-1]
         bg = "#10b981" if is_current else "#6366f1" if is_target else "#3b82f6"
         node_status = "CURRENT" if is_current else "TARGET" if is_target else "GAP"
         flow_nodes.append({
