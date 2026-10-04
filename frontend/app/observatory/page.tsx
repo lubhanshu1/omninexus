@@ -1262,7 +1262,7 @@ export default function Observatory() {
                       onClick={() => setCopilotOpen(true)}
                       className="flex items-center justify-center gap-2 rounded-xl bg-cyan-500 px-3 py-3 text-[10px] font-black text-[#041018] transition hover:bg-cyan-300"
                     >
-                      Ask Intelligence Copilot
+                      Ask Graph Copilot
                       <ArrowRight size={13} />
                     </button>
 
@@ -2062,7 +2062,7 @@ export default function Observatory() {
                     }`}
                 >
                   <div className="mb-2 text-[8px] font-black uppercase tracking-widest text-slate-600">
-                    {message.role === "user" ? "You" : "OmniNexus Graph Copilot"}
+                    {message.role === "user" ? "You" : "OmniNexus Graph Copilot · Demo"}
                   </div>
                   <p className="text-[11px] leading-5 text-slate-400">
                     {message.text}
