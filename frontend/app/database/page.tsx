@@ -1161,7 +1161,7 @@ export default function DatabaseView() {
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600"
                   />
 
-                  <select aria-label="Sort users"
+                  <select
                     value={sort}
                     onChange={(event) =>
                       setSort(event.target.value as SortType)
