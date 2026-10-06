@@ -71,3 +71,5 @@ Backend environment variables can override the database URL, JWT settings, and C
 ## Quality gates
 
 GitHub Actions runs backend tests plus frontend lint and production build on pushes and pull requests targeting `main`.
+
+> Production redeploy trigger: final Vercel build is ready from commit `5c255ac`.
