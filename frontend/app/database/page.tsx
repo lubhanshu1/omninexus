@@ -199,26 +199,6 @@ export default function DatabaseView() {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [showControls, setShowControls] = useState(false);
 
-  if (adminAllowed === null) {
-    return (
-      <main className="min-h-screen bg-[#030912] text-white flex items-center justify-center">
-        <div className="rounded-2xl border border-slate-800 bg-[#07111f] px-6 py-5 text-sm font-semibold text-slate-400">
-          Verifying administrator access...
-        </div>
-      </main>
-    );
-  }
-
-  if (adminAllowed === false) {
-    return (
-      <main className="min-h-screen bg-[#030912] text-white flex items-center justify-center">
-        <div className="rounded-2xl border border-rose-500/30 bg-[#100a12] px-6 py-5 text-sm font-semibold text-rose-300">
-          Access denied. Administrator access required.
-        </div>
-      </main>
-    );
-  }
-
   /* ========================================================================
      COPY
      ======================================================================== */
@@ -700,6 +680,30 @@ export default function DatabaseView() {
   const handleLoginRedirect = () => {
     router.push("/login");
   };
+
+  /* ========================================================================
+     ADMIN ACCESS GATE
+     ======================================================================== */
+
+  if (adminAllowed === null) {
+    return (
+      <main className="min-h-screen bg-[#030912] text-white flex items-center justify-center">
+        <div className="rounded-2xl border border-slate-800 bg-[#07111f] px-6 py-5 text-sm font-semibold text-slate-400">
+          Verifying administrator access...
+        </div>
+      </main>
+    );
+  }
+
+  if (adminAllowed === false) {
+    return (
+      <main className="min-h-screen bg-[#030912] text-white flex items-center justify-center">
+        <div className="rounded-2xl border border-rose-500/30 bg-[#100a12] px-6 py-5 text-sm font-semibold text-rose-300">
+          Access denied. Administrator access required.
+        </div>
+      </main>
+    );
+  }
 
   /* ========================================================================
      UI
