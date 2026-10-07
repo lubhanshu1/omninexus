@@ -80,7 +80,7 @@ const signals = [
 
 function OrbitalCore() {
   return (
-    <div className="relative mx-auto h-[390px] w-[390px] [perspective:1100px] sm:h-[470px] sm:w-[470px]">
+    <div className="relative mx-auto h-[390px] w-[390px] [perspective:1400px] sm:h-[470px] sm:w-[470px]">
       <div className="absolute inset-[12%] rounded-full border border-cyan-400/10 [transform:rotateX(70deg)]" />
       <div className="absolute inset-[6%] rounded-full border border-indigo-400/10 [transform:rotateY(68deg)]" />
       <div className="absolute inset-[18%] rounded-full border border-violet-400/10 [transform:rotateX(62deg)_rotateZ(28deg)]" />
@@ -112,12 +112,12 @@ function OrbitalCore() {
         </div>
       </div>
 
-      <div className="absolute left-0 top-[20%] rounded-2xl border border-slate-700/80 bg-[#08131f]/90 px-4 py-3 shadow-2xl backdrop-blur-xl">
+      <div className="absolute left-0 top-[17%] rounded-2xl border border-slate-700/80 bg-[#08131f]/90 px-4 py-3 shadow-2xl backdrop-blur-xl [transform:translateZ(55px)]">
         <div className="text-[8px] font-black tracking-[0.2em] text-slate-600">MARKET SIGNAL</div>
         <div className="mt-1 text-sm font-black text-cyan-300">DEMAND + SUPPLY</div>
       </div>
 
-      <div className="absolute bottom-[13%] right-0 rounded-2xl border border-slate-700/80 bg-[#08131f]/90 px-4 py-3 shadow-2xl backdrop-blur-xl">
+      <div className="absolute bottom-[11%] right-0 rounded-2xl border border-slate-700/80 bg-[#08131f]/90 px-4 py-3 shadow-2xl backdrop-blur-xl [transform:translateZ(75px)]">
         <div className="text-[8px] font-black tracking-[0.2em] text-slate-600">CAREER PATH</div>
         <div className="mt-1 text-sm font-black text-violet-300">SKILL → ROLE</div>
       </div>
@@ -239,7 +239,7 @@ export default function HomePage() {
                 <Link
                   key={module.href}
                   href={module.href}
-                  className={`group relative overflow-hidden rounded-[26px] border border-white/[0.07] bg-[#07111b]/80 p-6 transition duration-500 hover:-translate-y-2 hover:border-cyan-400/25 hover:shadow-[0_25px_70px_rgba(0,0,0,.3)] ${index === 0 ? "xl:col-span-2" : ""}`}
+                  className={`group relative overflow-hidden rounded-[26px] border border-white/[0.07] bg-[#07111b]/80 p-6 [perspective:900px] [transform-style:preserve-3d] transition duration-500 hover:-translate-y-2 hover:[transform:rotateX(2deg)_rotateY(-2deg)_translateY(-8px)] hover:border-cyan-400/25 hover:shadow-[0_25px_70px_rgba(0,0,0,.3)] ${index === 0 ? "xl:col-span-2" : ""}`}
                 >
                   <div className="absolute right-[-40px] top-[-50px] h-40 w-40 rounded-full bg-cyan-400/[0.035] blur-2xl transition group-hover:bg-cyan-400/[0.08]" />
                   <div className="relative">
@@ -249,8 +249,8 @@ export default function HomePage() {
                       </div>
                       <span className="text-[8px] font-black tracking-[0.22em] text-slate-700">{module.eyebrow}</span>
                     </div>
-                    <h3 className="mt-7 text-xl font-black">{module.title}</h3>
-                    <p className="mt-2 max-w-xl text-xs leading-6 text-slate-500">{module.description}</p>
+                    <h3 className="mt-7 text-xl font-black [transform:translateZ(14px)]">{module.title}</h3>
+                    <p className="mt-2 max-w-xl text-xs leading-6 text-slate-500 [transform:translateZ(8px)]">{module.description}</p>
                     <div className="mt-7 flex items-center justify-between border-t border-white/[0.06] pt-4">
                       <span className="text-[8px] font-black tracking-[0.18em] text-slate-600">{module.stat}</span>
                       <span className="flex items-center gap-1 text-[10px] font-bold text-cyan-300">Open <ArrowRight size={13} className="transition group-hover:translate-x-1" /></span>
