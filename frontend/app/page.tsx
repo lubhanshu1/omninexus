@@ -39,6 +39,16 @@ const modules = [
     metricLabel: "Match intelligence",
   },
   {
+    title: "Skill Intelligence",
+    description:
+      "Normalize capabilities and compare them with the supplied hackathon market sample to surface opportunity and skill gaps.",
+    href: "/skill-intelligence",
+    icon: BrainCircuit,
+    accent: "cyan",
+    metric: "15",
+    metricLabel: "Market skills analyzed",
+  },
+  {
     title: "Workforce Observatory",
     description:
       "Monitor demand, supply, skill gaps, market movement and workforce risk in one intelligence view.",
