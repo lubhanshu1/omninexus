@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { LucideIcon } from "lucide-react";
 import {
   Activity,
   ArrowRight,
@@ -18,7 +19,7 @@ import {
   Zap,
 } from "lucide-react";
 
-const modules = [
+const modules: Array<{ title: string; description: string; href: string; icon: LucideIcon; accent: "cyan" | "violet" | "emerald" | "amber"; metric: string; metricLabel: string }> = [
   {
     title: "Career Simulator",
     eyebrow: "01 / CAREER",
