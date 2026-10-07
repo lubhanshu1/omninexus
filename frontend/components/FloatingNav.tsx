@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { apiUrl, getStoredToken } from "@/lib/api";
 import {
   Activity,
+  BrainCircuit,
   BriefcaseBusiness,
   Database,
   LogOut,
@@ -19,6 +20,12 @@ const navItems = [
     shortName: "Career",
     path: "/career-simulator",
     icon: Sparkles,
+  },
+  {
+    name: "Intelligence",
+    shortName: "Intel",
+    path: "/intelligence",
+    icon: BrainCircuit,
   },
   {
     name: "Talent Matcher",
