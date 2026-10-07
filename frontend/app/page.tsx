@@ -29,6 +29,16 @@ const modules = [
     metricLabel: "Current alignment",
   },
   {
+    title: "Unified Intelligence",
+    description:
+      "Fuse career readiness, market opportunity, skill gaps and success-model evidence into one traceable decision layer.",
+    href: "/intelligence",
+    icon: BrainCircuit,
+    accent: "violet",
+    metric: "4",
+    metricLabel: "Evidence sources unified",
+  },
+  {
     title: "Talent Matcher",
     description:
       "Analyze candidate capability, role alignment and workforce fit through the talent intelligence layer.",
@@ -365,7 +375,7 @@ export default function HomePage() {
               </h2>
 
               <p className="mt-2 text-sm text-slate-500">
-                Five connected intelligence environments.
+                Connected intelligence environments with a shared evidence layer.
               </p>
             </div>
 
