@@ -46,6 +46,7 @@ import {
 } from "lucide-react";
 
 import { API_BASE_URL } from "@/lib/api";
+import { saveIntelligenceContext } from "@/lib/intelligence-context";
 
 const API_BASE = API_BASE_URL
 
@@ -310,6 +311,13 @@ export default function Observatory() {
   const [apiStatus, setApiStatus] = useState<"online" | "offline" | "checking">("checking");
   const [apiLatency, setApiLatency] = useState<number | null>(null);
   const [apiVersion, setApiVersion] = useState("—");
+
+  useEffect(() => {
+    saveIntelligenceContext({
+      skills: [],
+      targetRole: target,
+    });
+  }, [target]);
 
   const projectedDemand = useMemo(() => {
     return Math.round(5839 * (1 + scenario / 100));
