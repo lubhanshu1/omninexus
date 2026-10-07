@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { BrainCircuit, Search, Target, TrendingUp, ArrowUpRight } from "lucide-react";
 import { apiUrl } from "@/lib/api";
+import { saveIntelligenceContext } from "@/lib/intelligence-context";
 
 type Signal = { skill: string; postings?: number; demand_index?: number; salary_mid_lakh?: number; opportunity_score?: number | null; known_market_signal: boolean };
 type Result = { normalized_skills: string[]; skill_gaps: { skill: string; priority: string; reason: string }[]; market_signals: Signal[]; overall_opportunity_score: number; source_note: string };
@@ -26,6 +27,11 @@ export default function SkillIntelligencePage() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || "Analysis failed");
       setResult(data);
+      saveIntelligenceContext({
+        skills: data.normalized_skills || list,
+        targetRole: role,
+        opportunity: Number(data.overall_opportunity_score ?? 0),
+      });
     } catch (e) { setError(e instanceof Error ? e.message : "Analysis failed"); } finally { setLoading(false); }
   }
 
