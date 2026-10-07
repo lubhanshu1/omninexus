@@ -6,6 +6,7 @@ from app.core.security import get_current_user
 from app.schemas.career import GraphRequest, ResumeRequest
 from app.services.career_engine import analyze_career_path
 from app.services.resume_service import extract_skills_from_resume
+from app.services.skill_intelligence import analyze_skills
 
 router = APIRouter(prefix="/api/v1", tags=["career"])
 
@@ -126,6 +127,8 @@ def analyze_path(request: GraphRequest, current_user: User = Depends(get_current
                 "style": {"stroke": "#94a3b8", "strokeWidth": 2},
             })
 
+    market = analyze_skills(result.get("current_skills", request.current_skills), request.target_role)
+
     return {
         "status": "success",
         "readiness_score": result["readiness_score"],
@@ -133,4 +136,9 @@ def analyze_path(request: GraphRequest, current_user: User = Depends(get_current
         "market_value": result["market_value"],
         "flow_nodes": flow_nodes,
         "flow_edges": flow_edges,
+        "normalized_skills": market.get("normalized_skills", []),
+        "market_opportunity_score": market.get("overall_opportunity_score", 0),
+        "market_signals": market.get("market_signals", []),
+        "market_skill_gaps": market.get("skill_gaps", []),
+        "market_source_note": market.get("source_note", ""),
     }
