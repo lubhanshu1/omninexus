@@ -2,6 +2,27 @@
 
 OmniNexus is a workforce intelligence operating system built around career-transition analysis, talent matching, workforce observability, and an authenticated identity registry.
 
+## Hackathon Analytics Foundation
+
+For the SAS CU Hackathon, OmniNexus uses the four supplied datasets as an evidence pipeline:
+
+- **Data Science Jobs** — market demand, job titles, experience and compensation
+- **Analytics Jobs** — analytics roles, descriptions, skills, location and salary
+- **JDS Skill Traits** — technical skill signals associated with the supplied junior outcome
+- **SDS Personality Traits** — personality-trait signals associated with the supplied senior outcome
+
+The Round 2 analytics pipeline performs:
+
+`quality audit -> preparation -> EDA -> statistical testing -> ML comparison -> feature interpretation -> intelligence layer`
+
+The public repository does **not** contain the raw hackathon datasets. It contains the reproducible analytical code and documentation.
+
+### Round 2 documents
+
+- [Approach Note](docs/APPROACH_NOTE.md)
+- [Analytics Pipeline](analysis/README.md)
+- [Evidence outputs](analysis/)
+
 ## Architecture
 
 - **Frontend:** Next.js 16 + React 19 + TypeScript + Tailwind CSS v4
