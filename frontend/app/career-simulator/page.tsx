@@ -72,6 +72,7 @@ import {
 ========================================================= */
 
 import { API_BASE_URL, authHeaders } from "@/lib/api";
+import { saveIntelligenceContext } from "@/lib/intelligence-context";
 
 const API_URL = API_BASE_URL
 
@@ -731,6 +732,14 @@ const started = performance.now();
         setMarketSignals(data.market_signals ?? []);
         setMarketGaps(data.market_skill_gaps ?? []);
 
+        saveIntelligenceContext({
+          skills: currentSkills,
+          targetRole,
+          readiness: Number(data.readiness_score ?? 0),
+          opportunity: Number(data.market_opportunity_score ?? 0),
+          bottleneck: data.bottleneck_skill || null,
+        });
+
         setLastUpdated(
           new Date().toLocaleTimeString([], {
             hour: "2-digit",
@@ -758,6 +767,14 @@ const started = performance.now();
       setReadiness(local.readiness);
       setBottleneck(local.bottleneck);
       setMarketValue(local.marketValue);
+
+      saveIntelligenceContext({
+        skills: currentSkills,
+        targetRole,
+        readiness: local.readiness,
+        opportunity: local.marketValue,
+        bottleneck: local.bottleneck || null,
+      });
       setLastUpdated(
         new Date().toLocaleTimeString([], {
           hour: "2-digit",
