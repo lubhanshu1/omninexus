@@ -12,3 +12,7 @@ __pycache__/
 node_modules/
 .next/
 .DS_Store
+
+# Hackathon source data and generated evidence must stay local.
+analysis/data/
+analysis/output/
