@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight, BrainCircuit, Database, Gauge, ShieldCheck, Target, TrendingUp } from "lucide-react";
 import { apiUrl } from "@/lib/api";
+import { loadIntelligenceContext, saveIntelligenceContext } from "@/lib/intelligence-context";
 
 type Intelligence = {
   profile: { skills: string[]; target_role?: string | null; readiness_score?: number | null };
@@ -26,6 +27,13 @@ export default function IntelligencePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    const context = loadIntelligenceContext();
+    if (!context) return;
+    if (context.skills.length) setSkills(context.skills.join(", "));
+    if (context.targetRole) setRole(context.targetRole);
+  }, []);
+
   async function runAnalysis() {
     setLoading(true);
     setError("");
@@ -41,6 +49,13 @@ export default function IntelligencePage() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || "Intelligence analysis failed.");
       setResult(data);
+      saveIntelligenceContext({
+        skills: data.profile?.skills || skills.split(",").map((value) => value.trim()).filter(Boolean),
+        targetRole: data.profile?.target_role || role,
+        readiness: data.profile?.readiness_score ?? null,
+        opportunity: Number(data.market?.overall_opportunity_score ?? 0),
+        bottleneck: data.skill_gap?.missing?.[0] || null,
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Intelligence analysis failed.");
     } finally {
@@ -65,7 +80,9 @@ export default function IntelligencePage() {
           </h1>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-400 sm:text-base">
             A single evidence-backed layer combining the supplied hackathon market sample,
-            statistical findings, and interpretable success-model signals.
+            statistical findings, and interpretable success-model signals. This layer now
+            consumes the shared context produced by Career Simulator, Skill Intelligence,
+            and Workforce Observatory so the same profile and target role travel across the OS.
           </p>
         </header>
 
