@@ -180,21 +180,20 @@ export default function HomePage() {
               </div>
 
               <div className="mt-12 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
-                {[
-                  [Activity, "01", "Career"],
-                  [TrendingUp, "02", "Market"],
-                  [Users, "03", "Talent"],
-                  [Network, "04", "Graph"],
-                ].map(([Icon, num, label]) => {
-                  const I = Icon as typeof Activity;
-                  return (
-                    <div key={String(num)} className="rounded-2xl border border-white/[0.06] bg-white/[0.018] p-4">
-                      <I size={15} className="text-cyan-300" />
-                      <div className="mt-3 text-[9px] font-black tracking-[0.18em] text-slate-600">{num}</div>
-                      <div className="mt-1 text-xs font-bold text-slate-300">{label}</div>
-                    </div>
-                  );
-                })}
+                {(
+                  [
+                    [Activity, "01", "Career"],
+                    [TrendingUp, "02", "Market"],
+                    [Users, "03", "Talent"],
+                    [Network, "04", "Graph"],
+                  ] as Array<[LucideIcon, string, string]>
+                ).map(([Icon, num, label]) => (
+                  <div key={num} className="rounded-2xl border border-white/[0.06] bg-white/[0.018] p-4">
+                    <Icon size={15} className="text-cyan-300" />
+                    <div className="mt-3 text-[9px] font-black tracking-[0.18em] text-slate-600">{num}</div>
+                    <div className="mt-1 text-xs font-bold text-slate-300">{label}</div>
+                  </div>
+                ))}
               </div>
             </div>
 
