@@ -19,7 +19,16 @@ import {
   Zap,
 } from "lucide-react";
 
-const modules: Array<{ title: string; description: string; href: string; icon: LucideIcon; accent: "cyan" | "violet" | "emerald" | "amber"; metric: string; metricLabel: string }> = [
+type Module = {
+  title: string;
+  eyebrow: string;
+  description: string;
+  href: string;
+  icon: LucideIcon;
+  stat: string;
+};
+
+const modules: Module[] = [
   {
     title: "Career Simulator",
     eyebrow: "01 / CAREER",
