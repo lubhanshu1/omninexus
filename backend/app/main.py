@@ -10,6 +10,7 @@ from app.api.auth import router as auth_router
 from app.api.career import router as career_router
 from app.api.future_lab import router as future_lab_router
 from app.api.health import router as health_router
+from app.api.intelligence import router as intelligence_router
 from app.api.skill_intelligence import router as skill_intelligence_router
 
 from app.core.config import settings
@@ -186,6 +187,15 @@ app.add_middleware(
 
 app.include_router(
     health_router,
+)
+
+
+# ------------------------------------------------------------
+# Unified Evidence-backed Intelligence
+# ------------------------------------------------------------
+
+app.include_router(
+    intelligence_router,
 )
 
 
