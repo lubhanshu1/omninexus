@@ -91,6 +91,11 @@ type AnalysisResponse = {
   readiness_score?: number;
   bottleneck_skill?: string;
   market_value?: number;
+  market_opportunity_score?: number;
+  market_signals?: Array<{ skill: string; postings?: number; demand_index?: number; salary_mid_lakh?: number; opportunity_score?: number | null; known_market_signal?: boolean }>;
+  market_skill_gaps?: Array<{ skill: string; priority: string; reason: string }>;
+  market_source_note?: string;
+  normalized_skills?: string[];
   message?: string;
 };
 
@@ -459,6 +464,15 @@ export default function OmniNexusDashboard() {
   const [marketValue, setMarketValue] =
     useState(0);
 
+  const [marketOpportunity, setMarketOpportunity] =
+    useState(0);
+
+  const [marketSignals, setMarketSignals] =
+    useState<NonNullable<AnalysisResponse["market_signals"]>>([]);
+
+  const [marketGaps, setMarketGaps] =
+    useState<NonNullable<AnalysisResponse["market_skill_gaps"]>>([]);
+
   const [targetRole, setTargetRole] =
     useState("AI Engineer");
   useEffect(() => {
@@ -578,9 +592,9 @@ export default function OmniNexusDashboard() {
   const recommendedProject = projectRecommendations[nextProjectSkill] || projectRecommendations["Machine Learning"];
 
   const liveMarket = useMemo(() => {
-    const seed = readiness + skillCoverage + artifactTick;
-    return [72, 76, 74, 81, 79, 84, 82, 88, 86, 91, 89, 94].map((v, i) => Math.max(45, Math.min(100, v + ((seed + i * 7) % 7) - 3)));
-  }, [readiness, skillCoverage, artifactTick]);
+    const observed = marketSignals.map((signal) => Number(signal.demand_index ?? 0)).filter((value) => value > 0);
+    return observed.length ? observed : [0];
+  }, [marketSignals]);
 
   const systemArtifacts = useMemo(() => {
     const now = liveClock
@@ -713,6 +727,9 @@ const started = performance.now();
         );
         setBottleneck(data.bottleneck_skill || "No bottleneck detected");
         setMarketValue(Number(data.market_value ?? 0));
+        setMarketOpportunity(Number(data.market_opportunity_score ?? 0));
+        setMarketSignals(data.market_signals ?? []);
+        setMarketGaps(data.market_skill_gaps ?? []);
 
         setLastUpdated(
           new Date().toLocaleTimeString([], {
@@ -1174,10 +1191,11 @@ ${new Date().toLocaleString()}
           <div className="border-t border-slate-800/70 px-4 py-2.5 text-[10px] text-slate-500">{selectedRole.description}</div>
         </section>
 
-        <section className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <section className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-5">
           <MetricCard icon={Gauge} label="Career Readiness" value={`${readiness}%`} detail={careerLevel} accent="cyan" />
           <MetricCard icon={Layers3} label="Skill Coverage" value={`${skillCoverage}%`} detail={`${activeNodes} detected capabilities`} accent="violet" />
           <MetricCard icon={TrendingUp} label="Market Value" value={`₹${new Intl.NumberFormat("en-IN").format(Math.round(marketValue))}`} detail="Estimated skill-index value (INR)" accent="amber" />
+          <MetricCard icon={Target} label="Market Opportunity" value={`${marketOpportunity}`} detail="Hackathon sample signal (0–100)" accent="violet" />
           <MetricCard icon={Activity} label="Analysis Latency" value={latency !== null ? `${latency}ms` : "--"} detail={`Updated ${lastUpdated}`} accent="emerald" />
         </section>
 
@@ -1229,7 +1247,7 @@ ${new Date().toLocaleString()}
               <div className="rounded-2xl border border-slate-800/80 bg-[#07111d]/95 p-4"><div className="mb-3 flex items-center justify-between"><div><p className="text-[8px] font-black uppercase tracking-[0.2em] text-violet-400">Capability Radar</p><h3 className="mt-1 text-sm font-black text-white">Current vs target signal</h3></div><Target size={15} className="text-violet-400" /></div><div className="space-y-3">{["Core/Data", "ML", "GenAI", "Cloud", "MLOps"].map((label, i) => { const values = [skillCoverage, Math.min(100, skillCoverage + (currentSkills.includes("Machine Learning") ? 25 : 0)), Math.min(100, skillCoverage + (currentSkills.includes("LLMs") ? 25 : 0)), Math.min(100, skillCoverage + (currentSkills.includes("Cloud Computing") ? 25 : 0)), Math.min(100, skillCoverage + (currentSkills.includes("MLOps") ? 25 : 0))]; return <div key={label}><div className="mb-1 flex justify-between text-[7px] font-black uppercase tracking-wider"><span className="text-slate-500">{label}</span><span className="text-cyan-400">{values[i]}%</span></div><div className="h-1.5 rounded-full bg-slate-900"><div className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-violet-500 transition-all duration-500" style={{ width: `${values[i]}%` }} /></div></div>; })}</div></div>
             </section>
 
-            <section className="rounded-2xl border border-slate-800/80 bg-[#07111d]/95 p-4"><div className="mb-3 flex items-center justify-between"><div><p className="text-[8px] font-black uppercase tracking-[0.2em] text-cyan-500">Market Pulse</p><h3 className="mt-1 text-sm font-black text-white">Live capability demand</h3></div><TrendingUp size={15} className="text-emerald-400" /></div><div className="flex h-24 items-end gap-1 rounded-xl border border-slate-800 bg-[#040a11] p-3">{liveMarket.map((value, i) => <div key={i} className="flex-1 rounded-t bg-cyan-400/60 transition-all duration-700" style={{ height: `${value}%` }} />)}</div><div className="mt-2 grid grid-cols-3 gap-2 text-[7px] font-black uppercase tracking-wider text-slate-600"><span>Demand index</span><span className="text-center">{Math.round(liveMarket.reduce((a, b) => a + b, 0) / liveMarket.length)} current</span><span className="text-right text-emerald-400">LIVE +0.{artifactTick % 9}</span></div></section>
+            <section className="rounded-2xl border border-slate-800/80 bg-[#07111d]/95 p-4"><div className="mb-3 flex items-center justify-between"><div><p className="text-[8px] font-black uppercase tracking-[0.2em] text-cyan-500">Market Pulse</p><h3 className="mt-1 text-sm font-black text-white">Hackathon sample evidence</h3></div><TrendingUp size={15} className="text-emerald-400" /></div><div className="flex h-24 items-end gap-1 rounded-xl border border-slate-800 bg-[#040a11] p-3">{liveMarket.map((value, i) => <div key={i} className="flex-1 rounded-t bg-cyan-400/60 transition-all duration-700" style={{ height: value + "%" }} />)}</div><div className="mt-2 grid grid-cols-3 gap-2 text-[7px] font-black uppercase tracking-wider text-slate-600"><span>Demand percentile</span><span className="text-center">{marketSignals.length ? marketSignals.length + " skills" : "Run analysis"}</span><span className="text-right text-emerald-400">{marketOpportunity || "—"}</span></div>{marketSignals.length > 0 && <div className="mt-3 space-y-1.5">{marketSignals.slice(0,4).map((signal) => <div key={signal.skill} className="flex items-center justify-between rounded-lg border border-slate-800 bg-[#040a11] px-2.5 py-2"><span className="text-[8px] font-bold text-slate-300">{signal.skill}</span><span className="text-[8px] font-black text-cyan-400">{signal.opportunity_score ?? "—"}</span></div>)}</div>}{marketGaps.length > 0 && <div className="mt-3 border-t border-slate-800 pt-3"><p className="text-[7px] font-black uppercase tracking-wider text-amber-500">Market-backed gaps</p><div className="mt-1 flex flex-wrap gap-1">{marketGaps.slice(0,4).map((gap) => <span key={gap.skill} className="rounded-md border border-amber-500/10 bg-amber-500/[0.03] px-1.5 py-1 text-[7px] text-amber-300">{gap.skill}</span>)}</div></div>}</section>
 
             <section className="rounded-2xl border border-slate-800/80 bg-[#07111d]/95 p-4"><div className="mb-3 flex items-center justify-between"><div><p className="text-[8px] font-black uppercase tracking-[0.2em] text-amber-500">Execution Timeline</p><h3 className="mt-1 text-sm font-black text-white">Career transition phases</h3></div><GitBranch size={15} className="text-amber-400" /></div><div className="grid grid-cols-1 gap-2 md:grid-cols-3">{[{ n: "01", t: "Foundation", d: `Build ${prioritySkills[0] || "core capability"}`, s: "Current" }, { n: "02", t: "Bottleneck", d: `Resolve ${bottleneck}`, s: "Focus" }, { n: "03", t: "Production", d: `Ship a ${targetRole} system`, s: "Next" }].map(x => <div key={x.n} className="rounded-xl border border-slate-800 bg-[#040a11] p-3"><div className="flex items-center justify-between"><span className="text-[8px] font-black text-cyan-400">{x.n}</span><span className="rounded-full border border-slate-800 px-1.5 py-0.5 text-[6px] font-black uppercase text-slate-600">{x.s}</span></div><p className="mt-2 text-[10px] font-black text-white">{x.t}</p><p className="mt-1 text-[8px] leading-relaxed text-slate-600">{x.d}</p></div>)}</div></section>
 
