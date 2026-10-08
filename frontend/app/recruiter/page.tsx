@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Activity,
@@ -532,7 +532,7 @@ export default function RecruiterDashboard() {
 
   const [talentMatches, setTalentMatches] = useState<Candidate[]>([]);
 
-  const matchCandidates = async (candidateProfiles = demoCandidateProfiles) => {
+  const matchCandidates = useCallback(async (candidateProfiles = demoCandidateProfiles) => {
     try {
       const response = await fetch(`${API_BASE}/api/v1/talent-match`, {
         method: "POST",
@@ -556,13 +556,13 @@ export default function RecruiterDashboard() {
       setBackendOnline(false);
       setTalentMatches([]);
     }
-  };
+  }, [API_BASE, demoCandidateProfiles, role]);
 
   useEffect(() => {
     if (backendOnline) {
       void matchCandidates();
     }
-  }, [role, currentSkills, backendOnline]);
+  }, [backendOnline, matchCandidates]);
 
   const candidates: Candidate[] = talentMatches;
 
