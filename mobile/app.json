@@ -1,0 +1,7 @@
+{
+  "expo":{"name":"OmniNexus","slug":"omninexus","version":"1.0.0","orientation":"portrait","scheme":"omninexus","userInterfaceStyle":"dark","newArchEnabled":true,
+    "android":{"package":"com.omninexus.app","versionCode":1,"adaptiveIcon":{"backgroundColor":"#06111d"}},
+    "ios":{"bundleIdentifier":"com.omninexus.app"},
+    "plugins":["expo-router","expo-secure-store"]
+  }
+}
