@@ -312,6 +312,61 @@ export default function Observatory() {
   const [apiLatency, setApiLatency] = useState<number | null>(null);
   const [apiVersion, setApiVersion] = useState("—");
 
+  type ObservatorySnapshot = {
+    market?: {
+      top_skills?: Array<{
+        skill?: string;
+        postings?: number;
+        demand_index?: number;
+        salary_mid_lakh?: number;
+        opportunity_score?: number;
+      }>;
+      skills_tracked?: number;
+    };
+    signals?: {
+      experience_salary_rho?: number;
+      job_title_anova_f?: number;
+      posting_salary_rho?: number;
+      interpretation?: string;
+    };
+  };
+
+  const [snapshot, setSnapshot] = useState<ObservatorySnapshot | null>(null);
+  const [snapshotError, setSnapshotError] = useState("");
+
+  const liveSkills = useMemo<Skill[]>(() => {
+    const rows = snapshot?.market?.top_skills ?? [];
+    if (!rows.length) return skills;
+    return rows.map((row, index) => ({
+      name: row.skill ?? "Unknown skill",
+      demand: Math.round(row.demand_index ?? 0),
+      supply: Math.max(15, 100 - Math.round(row.demand_index ?? 0)),
+      growth: row.postings ? `${row.postings.toLocaleString()} postings` : "sample signal",
+      availabilityPressure:
+        (row.opportunity_score ?? 0) >= 80
+          ? "Critical"
+          : (row.opportunity_score ?? 0) >= 60
+            ? "High"
+            : "Medium",
+    }));
+  }, [snapshot]);
+
+  const loadSnapshot = useCallback(async () => {
+    try {
+      setSnapshotError("");
+      const response = await fetch(`${API_BASE}/api/v1/observatory/snapshot`, {
+        cache: "no-store",
+      });
+      if (!response.ok) throw new Error(`Snapshot request failed: ${response.status}`);
+      const data = (await response.json()) as ObservatorySnapshot;
+      setSnapshot(data);
+    } catch (error) {
+      setSnapshotError(error instanceof Error ? error.message : "Snapshot unavailable");
+    }
+  }, []);
+
+
+
   useEffect(() => {
     saveIntelligenceContext({
       skills: [],
@@ -393,9 +448,13 @@ export default function Observatory() {
 
   useEffect(() => {
     void checkSystem();
-    const interval = window.setInterval(() => void checkSystem(), 30000);
+    void loadSnapshot();
+    const interval = window.setInterval(() => {
+      void checkSystem();
+      void loadSnapshot();
+    }, 30000);
     return () => window.clearInterval(interval);
-  }, [checkSystem]);
+  }, [checkSystem, loadSnapshot]);
 
   const scrollToSection = (id: string) => {
     document.getElementById(id)?.scrollIntoView({
@@ -1287,7 +1346,19 @@ export default function Observatory() {
           </section>
 
           {/* SKILL INTELLIGENCE */}
-          <section id="skills" className="scroll-mt-24">
+  
+        {snapshotError && (
+          <div className="mb-4 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 text-xs text-amber-300">
+            Live market snapshot unavailable: {snapshotError}. Showing the resilient demo baseline.
+          </div>
+        )}
+        {snapshot?.signals?.interpretation && (
+          <div className="mb-4 rounded-xl border border-cyan-500/20 bg-cyan-500/5 px-4 py-3 text-[11px] leading-5 text-slate-400">
+            <span className="font-bold text-cyan-300">Evidence note:</span> {snapshot.signals.interpretation}
+          </div>
+        )}
+
+        <section id="skills" className="scroll-mt-24">
             <SectionHeader
               eyebrow="03 / Capability Signals"
               title="Capability demand intelligence"
@@ -1312,7 +1383,7 @@ export default function Observatory() {
                 </div>
 
                 <div className="space-y-3">
-                  {(showAllSkills ? skills : skills.slice(0, 6)).map(
+                  {(showAllSkills ? liveSkills : liveSkills.slice(0, 6)).map(
                     (skill) => (
                       <div
                         key={skill.name}
@@ -1375,7 +1446,7 @@ export default function Observatory() {
                 </div>
 
                 <div className="space-y-3">
-                  {skills.slice(0, 5).map((skill, index) => (
+                  {liveSkills.slice(0, 5).map((skill, index) => (
                     <div
                       key={skill.name}
                       className="flex items-center gap-3 rounded-xl border border-slate-800 bg-[#07101a] p-3"
