@@ -497,10 +497,10 @@ export default function RecruiterDashboard() {
    * ------------------------------------------------------------
    */
 
-  const currentSkills =
-    extractedSkills.length > 0
-      ? extractedSkills
-      : ["Python"];
+  const currentSkills = useMemo(
+    () => (extractedSkills.length > 0 ? extractedSkills : ["Python"]),
+    [extractedSkills],
+  );
 
   const missingSkills = calculateMissingSkills(currentSkills);
 
