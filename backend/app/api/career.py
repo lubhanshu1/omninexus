@@ -168,12 +168,14 @@ def analyze_path(request: GraphRequest, current_user: User = Depends(get_current
 @router.post("/talent-match", summary="Rank candidate profiles against a target role")
 def talent_match(request: TalentMatchRequest, current_user: User = Depends(get_current_user)):
     matches = []
+    canonical_target_role = None
 
     for candidate in request.candidates:
         result = analyze_career_path(candidate.current_skills, request.target_role)
         if result.get("status") == "error":
             continue
 
+        canonical_target_role = result["target_role"]
         normalized_skills = result.get("current_skills", [])
         market = analyze_skills(normalized_skills, result["target_role"])
         required_skills = [
@@ -218,7 +220,7 @@ def talent_match(request: TalentMatchRequest, current_user: User = Depends(get_c
 
     return {
         "status": "success",
-        "target_role": request.target_role.strip(),
+        "target_role": canonical_target_role or request.target_role.strip(),
         "candidate_count": len(matches),
         "matches": matches,
         "method": "deterministic skill-graph readiness + market intelligence",
