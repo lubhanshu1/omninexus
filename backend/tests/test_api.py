@@ -179,3 +179,12 @@ def test_password_rejects_nul(client):
         json={"email": unique_email(), "password": "Strong\u0000Pass123!"},
     )
     assert response.status_code == 422
+
+
+def test_observatory_snapshot(client):
+    response = client.get("/api/v1/observatory/snapshot")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "success"
+    assert "top_skills" in payload["market"]
+    assert "experience_salary_rho" in payload["signals"]
