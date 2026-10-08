@@ -67,6 +67,34 @@ export default function HomePage() {
       <StatCard label="Platform status" value={snapshot ? "Online" : "Connecting"} icon={Users}/>
     </section>
 
+    <section className="mt-8 overflow-hidden rounded-[28px] border border-cyan-500/20 bg-gradient-to-br from-cyan-500/[0.08] via-[#07121e] to-indigo-500/[0.08] p-6 sm:p-8">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <div className="max-w-2xl">
+          <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1.5 text-[10px] font-black tracking-[.18em] text-cyan-300">
+            <Zap size={13} />
+            OMNINEXUS MOBILE
+          </div>
+          <h2 className="mt-4 text-2xl font-black tracking-tight sm:text-3xl">Take your career intelligence with you.</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-400">Download the OmniNexus Android app and access your career readiness, skill gaps, market intelligence and Talent Twin from your phone.</p>
+          <div className="mt-4 flex flex-wrap gap-2 text-[10px] font-semibold text-slate-500">
+            <span className="rounded-full border border-slate-800 bg-slate-950/60 px-3 py-1.5">Android</span>
+            <span className="rounded-full border border-slate-800 bg-slate-950/60 px-3 py-1.5">Career Intelligence</span>
+            <span className="rounded-full border border-slate-800 bg-slate-950/60 px-3 py-1.5">Same OmniNexus account</span>
+          </div>
+        </div>
+        <div className="flex shrink-0 flex-col gap-2 sm:flex-row lg:flex-col xl:flex-row">
+          <a href="https://github.com/lubhanshu1/omninexus/releases/latest/download/OmniNexus.apk" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-cyan-400 px-6 py-3 text-sm font-black text-slate-950 transition hover:bg-cyan-300">
+            <ArrowUpRight size={17} />
+            Download Android App
+          </a>
+          <Link href="/career-simulator" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-950/60 px-6 py-3 text-sm font-semibold text-slate-300 transition hover:border-cyan-500/30 hover:text-white">
+            Continue on Web
+            <ArrowUpRight size={16} />
+          </Link>
+        </div>
+      </div>
+    </section>
+
     <section className="mt-12">
       <div className="mb-6"><div className="text-[11px] font-bold tracking-[.2em] text-cyan-400">APPLICATION MODULES</div><h2 className="mt-2 text-3xl font-black">Everything connected through one intelligence layer</h2></div>
       <div className="grid gap-4 md:grid-cols-2">
