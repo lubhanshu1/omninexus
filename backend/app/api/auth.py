@@ -214,7 +214,7 @@ def login(
     # Create JWT
     # --------------------------------------------------------
 
-    token = create_access_token(user.email)
+    token = create_access_token(user.email, token_version=user.token_version)
 
     return {
         "status": "success",

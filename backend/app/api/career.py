@@ -3,7 +3,7 @@ from io import BytesIO
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from app.models.user import User
 from app.core.security import get_current_user
-from app.schemas.career import GraphRequest, ResumeRequest
+from app.schemas.career import GraphRequest, ResumeRequest, TalentMatchRequest
 from app.services.career_engine import analyze_career_path
 from app.services.resume_service import extract_skills_from_resume
 from app.services.skill_intelligence import analyze_skills
@@ -127,13 +127,33 @@ def analyze_path(request: GraphRequest, current_user: User = Depends(get_current
                 "style": {"stroke": "#94a3b8", "strokeWidth": 2},
             })
 
-    market = analyze_skills(result.get("current_skills", request.current_skills), request.target_role)
+    normalized_skills = result.get("current_skills", [])
+    required_skills = [node for node in shortest_path if node != shortest_path[-1]]
+    missing_skills = result.get("missing_skills", [])
+    acquired_skills = [skill for skill in required_skills if skill not in set(missing_skills)]
+    graph_coverage = (
+        round((len(acquired_skills) / len(required_skills)) * 100)
+        if required_skills
+        else 100
+    )
+
+    canonical_target_role = result["target_role"]
+    market = analyze_skills(normalized_skills, canonical_target_role)
 
     return {
         "status": "success",
         "readiness_score": result["readiness_score"],
         "bottleneck_skill": result["bottleneck_skill"],
         "market_value": result["market_value"],
+        "explainability": {
+            "target_role": canonical_target_role,
+            "path_length": len(shortest_path),
+            "required_skills": required_skills,
+            "acquired_skills": acquired_skills,
+            "missing_skills": missing_skills,
+            "graph_coverage_percent": graph_coverage,
+            "method": "deterministic shortest-path skill graph analysis",
+        },
         "flow_nodes": flow_nodes,
         "flow_edges": flow_edges,
         "normalized_skills": market.get("normalized_skills", []),
@@ -141,4 +161,67 @@ def analyze_path(request: GraphRequest, current_user: User = Depends(get_current
         "market_signals": market.get("market_signals", []),
         "market_skill_gaps": market.get("skill_gaps", []),
         "market_source_note": market.get("source_note", ""),
+    }
+
+
+
+@router.post("/talent-match", summary="Rank candidate profiles against a target role")
+def talent_match(request: TalentMatchRequest, current_user: User = Depends(get_current_user)):
+    matches = []
+    canonical_target_role = None
+
+    for candidate in request.candidates:
+        result = analyze_career_path(candidate.current_skills, request.target_role)
+        if result.get("status") == "error":
+            continue
+
+        canonical_target_role = result["target_role"]
+        normalized_skills = result.get("current_skills", [])
+        market = analyze_skills(normalized_skills, result["target_role"])
+        required_skills = [
+            node for node in result["shortest_path"]
+            if node != result["shortest_path"][-1]
+        ]
+        missing_skills = result.get("missing_skills", [])
+        coverage = (
+            round(((len(required_skills) - len(missing_skills)) / len(required_skills)) * 100)
+            if required_skills else 100
+        )
+
+        matches.append({
+            "name": candidate.name.strip(),
+            "score": result["readiness_score"],
+            "current": normalized_skills,
+            "missing": missing_skills,
+            "status": (
+                "High Graph Proximity"
+                if result["readiness_score"] >= 80
+                else "Moderate Match"
+                if result["readiness_score"] >= 50
+                else "Upskilling Required"
+            ),
+            "evidence": "Deterministic skill graph + market intelligence",
+            "evidence_score": coverage,
+            "time_to_ready": (
+                "Ready Now"
+                if not missing_skills
+                else "Est. 2–6 Weeks"
+                if len(missing_skills) <= 2
+                else "Est. 2–4 Months"
+            ),
+            "bottleneck_skill": result["bottleneck_skill"],
+            "market_value": result["market_value"],
+            "market_opportunity_score": market.get("overall_opportunity_score", 0),
+            "market_signals": market.get("market_signals", []),
+            "shortest_path": result["shortest_path"],
+        })
+
+    matches.sort(key=lambda item: (-item["score"], item["name"].lower()))
+
+    return {
+        "status": "success",
+        "target_role": canonical_target_role or request.target_role.strip(),
+        "candidate_count": len(matches),
+        "matches": matches,
+        "method": "deterministic skill-graph readiness + market intelligence",
     }

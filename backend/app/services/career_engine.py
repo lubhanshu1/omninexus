@@ -25,7 +25,7 @@ def analyze_career_path(
 
     graph = build_skill_graph()
 
-    target_role = target_role.strip()
+    target_role = str(target_role or "").strip()
     canonical_roles = {role.lower(): role for role in ROLE_NODES}
     target_role = canonical_roles.get(target_role.lower(), target_role)
     if target_role not in ROLE_NODES:
@@ -42,8 +42,11 @@ def analyze_career_path(
     normalized_skills: list[str] = []
     seen: set[str] = set()
 
-    for raw_skill in current_skills:
-        canonical = known_by_lower.get(raw_skill.strip().lower())
+    for raw_skill in current_skills or []:
+        raw = str(raw_skill).strip()
+        if not raw:
+            continue
+        canonical = known_by_lower.get(raw.lower())
         if canonical and canonical not in ROLE_NODES and canonical not in seen:
             normalized_skills.append(canonical)
             seen.add(canonical)
@@ -51,6 +54,7 @@ def analyze_career_path(
     if target_role in normalized_skills:
         return {
             "status": "success",
+            "target_role": target_role,
             "shortest_path": [target_role],
             "current_skills": normalized_skills,
             "missing_skills": [],
@@ -122,6 +126,7 @@ def analyze_career_path(
 
     return {
         "status": "success",
+        "target_role": target_role,
         "shortest_path": best_path,
         "current_skills": normalized_skills,
         "missing_skills": missing_skills,

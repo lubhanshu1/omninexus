@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BrainCircuit, Search, Target, TrendingUp, ArrowUpRight } from "lucide-react";
 import { apiUrl } from "@/lib/api";
@@ -40,7 +41,7 @@ export default function SkillIntelligencePage() {
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 flex flex-col gap-5 rounded-3xl border border-slate-800/80 bg-[#07121e]/80 p-6 backdrop-blur-xl md:flex-row md:items-end md:justify-between">
           <div><div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.25em] text-cyan-400"><BrainCircuit size={15} /> Hackathon Intelligence Layer</div><h1 className="mt-3 text-3xl font-black tracking-tight sm:text-5xl">Skill Intelligence</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-slate-400">Normalize capabilities, compare them with the supplied hackathon market sample, and surface interpretable skill gaps.</p></div>
-          <a href="/" className="inline-flex items-center gap-2 text-sm font-bold text-cyan-400">OmniNexus Home <ArrowUpRight size={15} /></a>
+          <Link href="/" className="inline-flex items-center gap-2 text-sm font-bold text-cyan-400">OmniNexus Home <ArrowUpRight size={15} /></Link>
         </div>
         <section className="grid gap-5 lg:grid-cols-[0.85fr_1.15fr]">
           <div className="rounded-3xl border border-slate-800 bg-[#07111d]/95 p-5">

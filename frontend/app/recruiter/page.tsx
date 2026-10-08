@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Activity,
@@ -497,10 +497,10 @@ export default function RecruiterDashboard() {
    * ------------------------------------------------------------
    */
 
-  const currentSkills =
-    extractedSkills.length > 0
-      ? extractedSkills
-      : ["Python"];
+  const currentSkills = useMemo(
+    () => (extractedSkills.length > 0 ? extractedSkills : ["Python"]),
+    [extractedSkills],
+  );
 
   const missingSkills = calculateMissingSkills(currentSkills);
 
@@ -521,66 +521,50 @@ export default function RecruiterDashboard() {
    * state instead of having a permanently hard-coded score.
    */
 
-  const candidates: Candidate[] = useMemo(() => {
-    const primaryScore = Math.max(
-      0,
-      Math.min(100, Math.round(readiness))
-    );
+  const demoCandidateProfiles = useMemo(
+    () => [
+      { name: "Candidate A · Demo", current_skills: currentSkills },
+      { name: "Candidate B · Demo", current_skills: ["Python", "SQL"] },
+      { name: "Candidate C · Demo", current_skills: ["Data Analysis"] },
+    ],
+    [currentSkills],
+  );
 
-    const candidateA: Candidate = {
-      name: "Candidate A",
-      score: primaryScore,
-      current: currentSkills,
-      missing: missingSkills,
-      status:
-        primaryScore >= 80
-          ? "High Graph Proximity"
-          : primaryScore >= 50
-            ? "Moderate Match"
-            : "Upskilling Required",
-      evidence: extractedSkills.length
-        ? "FastAPI Resume Parser + Skill Graph"
-        : "Skill Profile + Career Graph",
-      evidenceScore: extractedSkills.length
-        ? 92
-        : 68,
-      timeToReady:
-        missingSkills.length === 0
-          ? "Ready Now"
-          : missingSkills.length <= 2
-            ? "Est. 2–6 Weeks"
-            : "Est. 2–4 Months",
-    };
+  const [talentMatches, setTalentMatches] = useState<Candidate[]>([]);
 
-    const candidateB: Candidate = {
-      name: "Candidate B · Demo",
-      score: Math.max(0, primaryScore - 13),
-      current: ["Python", "SQL"],
-      missing: ["PyTorch", "Docker"],
-      status: "Moderate Match",
-      evidence: "Demo dataset · Resume Parser",
-      evidenceScore: 72,
-      timeToReady: "Est. 2.5 Months",
-    };
+  const matchCandidates = useCallback(async (candidateProfiles = demoCandidateProfiles) => {
+    try {
+      const response = await fetch(`${API_BASE}/api/v1/talent-match`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...authHeaders(),
+        },
+        body: JSON.stringify({
+          target_role: role,
+          candidates: candidateProfiles,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok || data.status !== "success" || !Array.isArray(data.matches)) {
+        throw new Error("Talent matching failed");
+      }
+      setTalentMatches(data.matches);
+      setBackendOnline(true);
+    } catch (error) {
+      console.error("Talent matching failed:", error);
+      setBackendOnline(false);
+      setTalentMatches([]);
+    }
+  }, [demoCandidateProfiles, role]);
 
-    const candidateC: Candidate = {
-      name: "Candidate C · Demo",
-      score: Math.max(0, primaryScore - 29),
-      current: ["Data Analysis"],
-      missing: ["Cloud Computing", "PyTorch", "MLOps"],
-      status: "Upskilling Required",
-      evidence: "Demo dataset · Assessment Pending",
-      evidenceScore: 42,
-      timeToReady: "Est. 6+ Months",
-    };
+  useEffect(() => {
+    if (backendOnline) {
+      void matchCandidates();
+    }
+  }, [backendOnline, matchCandidates]);
 
-    return [candidateA, candidateB, candidateC];
-  }, [
-    readiness,
-    currentSkills,
-    missingSkills,
-    extractedSkills.length,
-  ]);
+  const candidates: Candidate[] = talentMatches;
 
   /*
    * ------------------------------------------------------------
