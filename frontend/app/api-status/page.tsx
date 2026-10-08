@@ -7,7 +7,7 @@ import { Activity, ArrowLeft, CheckCircle2, XCircle } from "lucide-react";
 
 export default function ApiStatusPage() {
   const [state,setState] = useState<"checking"|"online"|"offline">("checking");
-  const [payload,setPayload] = useState<unknown>(null);
+  const [payload,setPayload] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
     fetch(apiUrl("/api/v1/health"), { cache:"no-store" })
