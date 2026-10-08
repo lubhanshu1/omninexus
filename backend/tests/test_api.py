@@ -260,3 +260,36 @@ def test_talent_match_ranks_candidates_with_graph_intelligence(client):
     assert payload["matches"][0]["score"] > payload["matches"][1]["score"]
     assert payload["matches"][0]["shortest_path"]
     assert "market_signals" in payload["matches"][0]
+
+
+def test_talent_match_rejects_blank_candidate_name(client):
+    _, token = create_user(client)
+    response = client.post(
+        "/api/v1/talent-match",
+        json={
+            "target_role": "AI Engineer",
+            "candidates": [{"name": "   ", "current_skills": ["Python"]}],
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 422
+
+
+def test_talent_match_normalizes_duplicate_skills(client):
+    _, token = create_user(client)
+    response = client.post(
+        "/api/v1/talent-match",
+        json={
+            "target_role": "AI Engineer",
+            "candidates": [
+                {
+                    "name": "Candidate Clean",
+                    "current_skills": [" Python ", "python", "", "Machine Learning"],
+                }
+            ],
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    candidate = response.json()["matches"][0]
+    assert candidate["current"] == ["Python", "Machine Learning"]
