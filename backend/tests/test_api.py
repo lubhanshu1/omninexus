@@ -306,7 +306,7 @@ def test_logout_then_login_issues_valid_session(client):
 
     login = client.post(
         "/api/v1/auth/login",
-        json={"email": email, "password": TEST_PASSWORD},
+        json={"email": email, "password": "StrongPass123!"},
     )
     assert login.status_code == 200
     new_token = login.json()["token"]
