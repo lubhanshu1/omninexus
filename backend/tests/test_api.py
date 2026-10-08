@@ -148,6 +148,9 @@ def test_career_analysis_normalizes_role_and_rejects_unknown_target(client):
         headers=headers,
     )
     assert normalized.status_code == 200
+    normalized_payload = normalized.json()
+    assert normalized_payload["explainability"]["target_role"] == "AI Engineer"
+    assert normalized_payload["market_skill_gaps"]
 
     unknown = client.post(
         "/api/v1/analyze",
