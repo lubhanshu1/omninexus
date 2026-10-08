@@ -69,25 +69,51 @@ The frontend defaults to `http://localhost:3000` and the API to `http://localhos
 
 ## API
 
-- `GET /api/v1/health`
-- `POST /api/v1/auth/signup`
-- `POST /api/v1/auth/login`
-- `GET /api/v1/auth/me`
-- `POST /api/v1/parse-resume`
-- `POST /api/v1/analyze`
-- `GET /api/v1/admin/users`
+Core endpoints:
 
-Swagger is available at `/docs` when the backend is running.
+- `GET /api/v1/health` — liveness/health check
+- `GET /api/v1/system/status` — database-backed readiness/status check
+- `POST /api/v1/auth/signup` — create an account
+- `POST /api/v1/auth/login` — issue a JWT
+- `POST /api/v1/auth/logout` — revoke the current token version
+- `GET /api/v1/auth/me` — authenticated identity
+- `POST /api/v1/parse-resume` — extract skills from resume text
+- `POST /api/v1/parse-resume-file` — parse supported resume files
+- `POST /api/v1/analyze` — graph-based career analysis
+- `POST /api/v1/talent-match` — candidate matching
+- `GET /api/v1/observatory/snapshot` — workforce/market snapshot
+- `GET /api/v1/admin/users` — admin-only identity registry
+
+Swagger/OpenAPI is enabled outside production. In production, `ENVIRONMENT=production` disables `/docs`, `/redoc`, and `/openapi.json`.
 
 ## Environment
 
-Frontend:
+### Frontend
+
+Copy `frontend/.env.example` to `frontend/.env.local`:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8001
 ```
 
-Backend environment variables can override the database URL, JWT settings, and CORS origins.
+For deployment, set `NEXT_PUBLIC_API_URL` to the public HTTPS backend URL.
+
+### Backend
+
+Copy `backend/.env.example` and provide real production values:
+
+```env
+JWT_SECRET_KEY=<at-least-32-character-random-secret>
+ENVIRONMENT=production
+DATABASE_URL=<postgresql-connection-string>
+CORS_ORIGINS=https://<your-frontend-domain>
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+ADMIN_EMAILS=<comma-separated-admin-emails>
+```
+
+**Production note:** SQLite is the local-development default. Use PostgreSQL (or another persistent managed SQL database) for deployment; do not rely on an ephemeral filesystem for production user data.
+
+The backend intentionally fails fast when `JWT_SECRET_KEY` is missing or shorter than 32 characters.
 
 ## Quality gates
 
