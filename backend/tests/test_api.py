@@ -213,3 +213,19 @@ def test_observatory_snapshot(client):
     assert payload["status"] == "success"
     assert "top_skills" in payload["market"]
     assert "experience_salary_rho" in payload["signals"]
+
+
+def test_career_analysis_exposes_graph_evidence(client):
+    _, token = create_user(client)
+    response = client.post(
+        "/api/v1/analyze",
+        json={"current_skills": ["Python", "Git"], "target_role": "AI Engineer"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    evidence = response.json()["explainability"]
+    assert evidence["method"] == "deterministic shortest-path skill graph analysis"
+    assert evidence["target_role"] == "AI Engineer"
+    assert evidence["path_length"] >= 1
+    assert 0 <= evidence["graph_coverage_percent"] <= 100
+    assert evidence["required_skills"]
