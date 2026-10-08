@@ -317,3 +317,11 @@ def test_logout_then_login_issues_valid_session(client):
     )
     assert me.status_code == 200
     assert me.json()["email"] == email
+
+
+def test_system_status_reports_database_online(client):
+    response = client.get("/api/v1/system/status")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "online"
+    assert payload["checks"]["database_query"] is True
