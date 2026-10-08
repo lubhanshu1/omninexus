@@ -7,6 +7,7 @@ from sqlalchemy.orm import sessionmaker
 
 from app.database import Base, get_db
 from app.main import app
+from app.core.security import _RATE_LIMIT_BUCKETS, _RATE_LIMIT_LOCK
 
 
 @pytest.fixture()
@@ -28,6 +29,8 @@ def client(tmp_path):
         yield test_client
     app.dependency_overrides.clear()
     Base.metadata.drop_all(bind=engine)
+    with _RATE_LIMIT_LOCK:
+        _RATE_LIMIT_BUCKETS.clear()
 
 
 def unique_email():
