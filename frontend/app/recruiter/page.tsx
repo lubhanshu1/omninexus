@@ -556,7 +556,7 @@ export default function RecruiterDashboard() {
       setBackendOnline(false);
       setTalentMatches([]);
     }
-  }, [API_BASE, demoCandidateProfiles, role]);
+  }, [demoCandidateProfiles, role]);
 
   useEffect(() => {
     if (backendOnline) {
