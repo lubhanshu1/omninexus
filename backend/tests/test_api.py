@@ -293,3 +293,27 @@ def test_talent_match_normalizes_duplicate_skills(client):
     assert response.status_code == 200
     candidate = response.json()["matches"][0]
     assert candidate["current"] == ["Python", "Machine Learning"]
+
+
+
+def test_logout_then_login_issues_valid_session(client):
+    email, token = create_user(client)
+    logout = client.post(
+        "/api/v1/auth/logout",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert logout.status_code == 200
+
+    login = client.post(
+        "/api/v1/auth/login",
+        json={"email": email, "password": TEST_PASSWORD},
+    )
+    assert login.status_code == 200
+    new_token = login.json()["token"]
+
+    me = client.get(
+        "/api/v1/auth/me",
+        headers={"Authorization": f"Bearer {new_token}"},
+    )
+    assert me.status_code == 200
+    assert me.json()["email"] == email
