@@ -181,6 +181,31 @@ def test_password_rejects_nul(client):
     assert response.status_code == 422
 
 
+def test_career_analysis_handles_empty_skills_and_whitespace(client):
+    _, token = create_user(client)
+    headers = {"Authorization": f"Bearer {token}"}
+
+    response = client.post(
+        "/api/v1/analyze",
+        json={"current_skills": ["", "Python", " python "], "target_role": " AI Engineer "},
+        headers=headers,
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "success"
+    assert payload["normalized_skills"] == ["Python"]
+
+
+def test_resume_file_rejects_unsupported_format(client):
+    _, token = create_user(client)
+    response = client.post(
+        "/api/v1/parse-resume-file",
+        headers={"Authorization": f"Bearer {token}"},
+        files={"file": ("resume.exe", b"not a resume", "application/octet-stream")},
+    )
+    assert response.status_code == 415
+
+
 def test_observatory_snapshot(client):
     response = client.get("/api/v1/observatory/snapshot")
     assert response.status_code == 200
