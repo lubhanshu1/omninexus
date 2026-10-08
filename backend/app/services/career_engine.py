@@ -54,6 +54,7 @@ def analyze_career_path(
     if target_role in normalized_skills:
         return {
             "status": "success",
+            "target_role": target_role,
             "shortest_path": [target_role],
             "current_skills": normalized_skills,
             "missing_skills": [],
@@ -125,6 +126,7 @@ def analyze_career_path(
 
     return {
         "status": "success",
+        "target_role": target_role,
         "shortest_path": best_path,
         "current_skills": normalized_skills,
         "missing_skills": missing_skills,
