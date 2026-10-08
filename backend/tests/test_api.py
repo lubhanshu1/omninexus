@@ -235,3 +235,28 @@ def test_career_analysis_exposes_graph_evidence(client):
     assert evidence["path_length"] >= 1
     assert 0 <= evidence["graph_coverage_percent"] <= 100
     assert evidence["required_skills"]
+
+
+
+def test_talent_match_ranks_candidates_with_graph_intelligence(client):
+    _, token = create_user(client)
+    response = client.post(
+        "/api/v1/talent-match",
+        json={
+            "target_role": "ai engineer",
+            "candidates": [
+                {"name": "Candidate B", "current_skills": ["Python", "Machine Learning", "Deep Learning", "PyTorch", "MLOps"]},
+                {"name": "Candidate A", "current_skills": ["Python"]},
+            ],
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "success"
+    assert payload["target_role"] == "ai engineer"
+    assert payload["candidate_count"] == 2
+    assert payload["matches"][0]["name"] == "Candidate B"
+    assert payload["matches"][0]["score"] > payload["matches"][1]["score"]
+    assert payload["matches"][0]["shortest_path"]
+    assert "market_signals" in payload["matches"][0]
