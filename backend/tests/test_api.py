@@ -254,7 +254,7 @@ def test_talent_match_ranks_candidates_with_graph_intelligence(client):
     assert response.status_code == 200
     payload = response.json()
     assert payload["status"] == "success"
-    assert payload["target_role"] == "ai engineer"
+    assert payload["target_role"] == "AI Engineer"
     assert payload["candidate_count"] == 2
     assert payload["matches"][0]["name"] == "Candidate B"
     assert payload["matches"][0]["score"] > payload["matches"][1]["score"]
