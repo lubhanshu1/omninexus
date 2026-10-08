@@ -137,7 +137,8 @@ def analyze_path(request: GraphRequest, current_user: User = Depends(get_current
         else 100
     )
 
-    market = analyze_skills(normalized_skills, request.target_role)
+    canonical_target_role = result["target_role"]
+    market = analyze_skills(normalized_skills, canonical_target_role)
 
     return {
         "status": "success",
@@ -145,7 +146,7 @@ def analyze_path(request: GraphRequest, current_user: User = Depends(get_current
         "bottleneck_skill": result["bottleneck_skill"],
         "market_value": result["market_value"],
         "explainability": {
-            "target_role": request.target_role.strip(),
+            "target_role": canonical_target_role,
             "path_length": len(shortest_path),
             "required_skills": required_skills,
             "acquired_skills": acquired_skills,
