@@ -127,13 +127,32 @@ def analyze_path(request: GraphRequest, current_user: User = Depends(get_current
                 "style": {"stroke": "#94a3b8", "strokeWidth": 2},
             })
 
-    market = analyze_skills(result.get("current_skills", request.current_skills), request.target_role)
+    normalized_skills = result.get("current_skills", [])
+    required_skills = [node for node in shortest_path if node != shortest_path[-1]]
+    missing_skills = result.get("missing_skills", [])
+    acquired_skills = [skill for skill in required_skills if skill not in set(missing_skills)]
+    graph_coverage = (
+        round((len(acquired_skills) / len(required_skills)) * 100)
+        if required_skills
+        else 100
+    )
+
+    market = analyze_skills(normalized_skills, request.target_role)
 
     return {
         "status": "success",
         "readiness_score": result["readiness_score"],
         "bottleneck_skill": result["bottleneck_skill"],
         "market_value": result["market_value"],
+        "explainability": {
+            "target_role": request.target_role.strip(),
+            "path_length": len(shortest_path),
+            "required_skills": required_skills,
+            "acquired_skills": acquired_skills,
+            "missing_skills": missing_skills,
+            "graph_coverage_percent": graph_coverage,
+            "method": "deterministic shortest-path skill graph analysis",
+        },
         "flow_nodes": flow_nodes,
         "flow_edges": flow_edges,
         "normalized_skills": market.get("normalized_skills", []),
