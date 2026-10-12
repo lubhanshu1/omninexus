@@ -12,6 +12,7 @@ import {
   LogOut,
   Network,
   Sparkles,
+  MessageCircle,
 } from "lucide-react";
 
 const navItems = [
@@ -20,6 +21,12 @@ const navItems = [
     shortName: "Career",
     path: "/career-simulator",
     icon: Sparkles,
+  },
+  {
+    name: "AI Assistant",
+    shortName: "AI Chat",
+    path: "/ai-assistant",
+    icon: MessageCircle,
   },
   {
     name: "Intelligence",
