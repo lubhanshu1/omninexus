@@ -9,6 +9,8 @@ load_dotenv()
 class Settings:
     def __init__(self) -> None:
         self.DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./omninexus.db")
+        self.OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
+        self.OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini").strip()
 
         jwt_secret = os.getenv("JWT_SECRET_KEY")
         if not jwt_secret:
