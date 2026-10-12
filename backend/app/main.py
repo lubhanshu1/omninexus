@@ -11,6 +11,7 @@ from app.api.career import router as career_router
 from app.api.future_lab import router as future_lab_router
 from app.api.health import router as health_router
 from app.api.intelligence import router as intelligence_router
+from app.api.ai_assistant import router as ai_assistant_router
 from app.api.observatory import router as observatory_router
 from app.api.skill_intelligence import router as skill_intelligence_router
 
@@ -197,6 +198,10 @@ app.include_router(
 
 app.include_router(
     intelligence_router,
+)
+
+app.include_router(
+    ai_assistant_router,
 )
 
 
