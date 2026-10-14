@@ -870,6 +870,7 @@ const started = performance.now();
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            ...authHeaders(),
           },
           body: JSON.stringify({
             resume_text: cleanedResume,
