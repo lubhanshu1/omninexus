@@ -122,7 +122,7 @@ Core capabilities:
 
     lifespan=lifespan,
 
-    docs_url="/docs" if settings.ENVIRONMENT != "production" else None,
+    docs_url="/docs" if settings.ENVIRONMENT.strip().lower() != "production" else None,
 
     redoc_url="/redoc" if settings.ENVIRONMENT != "production" else None,
 
@@ -150,10 +150,14 @@ async def request_size_guard(request: Request, call_next):
     content_length = request.headers.get("content-length")
     if content_length:
         try:
-            if int(content_length) > 1_000_000:
+            parsed_length = int(content_length)
+            if parsed_length < 0:
+                return JSONResponse(status_code=400, content={"detail": "Invalid Content-Length."})
+            limit = 5_000_000 if request.url.path.endswith("/parse-resume-file") else 1_000_000
+            if parsed_length > limit:
                 return JSONResponse(
                     status_code=413,
-                    content={"detail": "Request body is too large."},
+                    content={"detail": f"Request body exceeds the {limit // 1_000_000} MB limit."},
                 )
         except ValueError:
             return JSONResponse(status_code=400, content={"detail": "Invalid Content-Length."})

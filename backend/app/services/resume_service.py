@@ -41,7 +41,7 @@ def extract_skills_from_resume(resume_text: str) -> list[str]:
     extracted: set[str] = set()
 
     for phrase, canonical in sorted(ALIASES.items(), key=lambda item: -len(item[0])):
-        if re.search(rf"(?<!\\w){re.escape(phrase)}(?!\\w)", text):
+        if re.search(rf"(?<!\w){re.escape(phrase)}(?!\w)", text):
             extracted.add(canonical)
 
     # Only include graph capabilities, never role nodes.

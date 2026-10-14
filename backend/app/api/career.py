@@ -7,6 +7,7 @@ from app.schemas.career import GraphRequest, ResumeRequest, TalentMatchRequest
 from app.services.career_engine import analyze_career_path
 from app.services.resume_service import extract_skills_from_resume
 from app.services.skill_intelligence import analyze_skills
+from app.services.skill_graph import ROLE_NODES
 
 router = APIRouter(prefix="/api/v1", tags=["career"])
 
@@ -69,7 +70,13 @@ async def parse_resume_file(
         else:
             from docx import Document
             document = Document(BytesIO(payload))
-            text_content = "\n".join(paragraph.text for paragraph in document.paragraphs)
+            paragraphs = [paragraph.text for paragraph in document.paragraphs]
+            table_rows = [
+                " | ".join(cell.text.strip() for cell in row.cells)
+                for table in document.tables
+                for row in table.rows
+            ]
+            text_content = "\n".join(part for part in [*paragraphs, *table_rows] if part.strip())
     except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -167,11 +174,18 @@ def analyze_path(request: GraphRequest, current_user: User = Depends(get_current
 
 @router.post("/talent-match", summary="Rank candidate profiles against a target role")
 def talent_match(request: TalentMatchRequest, current_user: User = Depends(get_current_user)):
+    requested_role = str(request.target_role or "").strip()
+    canonical_roles = {role.lower(): role for role in ROLE_NODES}
+    if requested_role.lower() not in canonical_roles:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Unknown target role '{requested_role}'. Choose one of: {', '.join(sorted(ROLE_NODES))}.",
+        )
     matches = []
     canonical_target_role = None
 
     for candidate in request.candidates:
-        result = analyze_career_path(candidate.current_skills, request.target_role)
+        result = analyze_career_path(candidate.current_skills, canonical_roles[requested_role.lower()])
         if result.get("status") == "error":
             continue
 

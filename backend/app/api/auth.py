@@ -103,7 +103,7 @@ def signup(
     user = User(
         email=email,
         password_hash=hash_password(request.password),
-        role="admin" if email in settings.ADMIN_EMAILS else "user",
+        role="user",  # Admin privileges require explicit promotion; signup is not email verification.
     )
     user.last_active = datetime.now(timezone.utc).isoformat()
 
@@ -202,11 +202,8 @@ def login(
 
     clear_rate_limit(rate_key)
 
-    # Keep the configured admin account synchronized with the admin allowlist.
-    # This also upgrades an already-registered admin account on its next login.
-    if email in settings.ADMIN_EMAILS:
-        user.role = "admin"
-
+    # Do not grant admin privileges during signup/login: without verified email,
+    # an attacker could pre-register an allow-listed address.
     user.last_active = datetime.now(timezone.utc).isoformat()
     db.commit()
 

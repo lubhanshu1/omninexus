@@ -98,6 +98,11 @@ def get_current_user(
 
 
 def require_admin(current_user: User = Depends(get_current_user)) -> User:
-    if current_user.role.strip().lower() == "admin" or current_user.email.lower() in settings.ADMIN_EMAILS:
+    # Require both an explicitly promoted database role and current allow-list
+    # membership. The allow-list alone must not elevate an unverified signup.
+    if (
+        current_user.role.strip().lower() == "admin"
+        and current_user.email.strip().lower() in settings.ADMIN_EMAILS
+    ):
         return current_user
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required.")

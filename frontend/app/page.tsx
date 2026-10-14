@@ -8,7 +8,7 @@ import AppShell from "@/components/AppShell";
 
 type Snapshot = {
   status: string;
-  market?: { top_skills: Array<{skill:string; job_records:number; mean_salary_midpoint:number}>; skills_tracked:number };
+  market?: { top_skills: Array<{skill:string; postings:number; salary_mid_lakh:number}>; skills_tracked:number };
   signals?: {experience_salary_rho:number; job_title_anova_f:number; posting_salary_rho:number; interpretation:string};
 };
 
@@ -77,7 +77,7 @@ export default function HomePage() {
     {snapshot?.market?.top_skills?.length ? <section className="mt-12 rounded-2xl border border-slate-800 bg-[#07121e] p-6">
       <div className="flex items-center justify-between gap-4"><div><div className="text-[11px] font-bold tracking-[.2em] text-indigo-400">MARKET SIGNAL</div><h2 className="mt-2 text-2xl font-black">Top skills in the analysed sample</h2></div><Link href="/skill-intelligence" className="text-sm font-semibold text-cyan-400">Explore <ArrowUpRight className="inline" size={14}/></Link></div>
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-       {snapshot.market.top_skills.slice(0,10).map((x,i)=><div key={x.skill} className="rounded-xl border border-slate-800 bg-slate-950/50 p-4"><div className="text-xs text-slate-500">#{i+1}</div><div className="mt-2 font-bold">{x.skill}</div><div className="mt-3 text-xs text-slate-500">{x.job_records.toLocaleString()} records</div><div className="mt-1 text-sm font-bold text-cyan-300">₹{Number(x.mean_salary_midpoint).toFixed(2)}L</div></div>)}
+       {snapshot.market.top_skills.slice(0,10).map((x,i)=><div key={x.skill} className="rounded-xl border border-slate-800 bg-slate-950/50 p-4"><div className="text-xs text-slate-500">#{i+1}</div><div className="mt-2 font-bold">{x.skill}</div><div className="mt-3 text-xs text-slate-500">{Number(x.postings ?? 0).toLocaleString()} records</div><div className="mt-1 text-sm font-bold text-cyan-300">₹{Number(x.salary_mid_lakh ?? 0).toFixed(2)}L</div></div>)}
       </div>
      </section> : null}
    </div>
