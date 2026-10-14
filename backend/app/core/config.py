@@ -9,7 +9,8 @@ load_dotenv()
 class Settings:
     def __init__(self) -> None:
         self.DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./omninexus.db")
-        self.OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
+        openai_key = os.getenv("OPENAI_API_KEY", "").strip()
+        self.OPENAI_API_KEY = "" if openai_key.lower().startswith(("replace-", "your-", "example-")) else openai_key
         self.OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini").strip()
 
         jwt_secret = os.getenv("JWT_SECRET_KEY")
@@ -17,8 +18,18 @@ class Settings:
             raise RuntimeError(
                 "JWT_SECRET_KEY must be set to a strong random secret before starting OmniNexus."
             )
+        placeholder_secrets = {
+            "replace-with-a-random-secret-at-least-32-characters-long",
+            "changeme",
+            "change-me",
+            "secret",
+        }
+        if jwt_secret.strip().lower() in placeholder_secrets:
+            raise RuntimeError("JWT_SECRET_KEY is still a placeholder; configure a unique secret.")
         if len(jwt_secret) < 32:
             raise RuntimeError("JWT_SECRET_KEY must be at least 32 characters long.")
+        if os.getenv("ENVIRONMENT", "development").strip().lower() == "production" and jwt_secret.strip().lower().startswith(("replace-", "your-", "example-")):
+            raise RuntimeError("Production JWT_SECRET_KEY cannot be a placeholder.")
         self.JWT_SECRET_KEY = jwt_secret
 
         self.JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
