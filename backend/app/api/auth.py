@@ -182,12 +182,6 @@ def login(
             },
         )
 
-    if not user.is_active or user.status.strip().lower() != "active":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="User account is inactive.",
-        )
-
     if not verify_password(
         request.password,
         user.password_hash,
@@ -198,6 +192,13 @@ def login(
             headers={
                 "WWW-Authenticate": "Bearer",
             },
+        )
+
+    # Do not reveal inactive-account state until the password is verified.
+    if not user.is_active or user.status.strip().lower() != "active":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User account is inactive.",
         )
 
     clear_rate_limit(rate_key)
