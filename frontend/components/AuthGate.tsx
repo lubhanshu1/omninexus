@@ -41,19 +41,23 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       signal: controller.signal,
     })
       .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Auth validation failed: ${response.status}`);
+        if (controller.signal.aborted) return;
+        if (response.status === 401 || response.status === 403) {
+          window.sessionStorage.removeItem("omninexus_token");
+          window.localStorage.removeItem("omninexus_authenticated");
+          window.localStorage.removeItem("omninexus_user_email");
+          window.localStorage.removeItem("omninexus_login_time");
+          router.replace("/login");
+          return;
         }
+        // Keep the current session on transient network/API failures.
+        // Protected API calls will surface their own errors and can be retried.
         setReady(true);
       })
       .catch((error) => {
         if (controller.signal.aborted) return;
-        console.warn("OmniNexus session validation failed:", error);
-        window.sessionStorage.removeItem("omninexus_token");
-        window.localStorage.removeItem("omninexus_authenticated");
-        window.localStorage.removeItem("omninexus_user_email");
-        window.localStorage.removeItem("omninexus_login_time");
-        router.replace("/login");
+        console.warn("OmniNexus session validation temporarily failed:", error);
+        setReady(true);
       });
 
     return () => controller.abort();
