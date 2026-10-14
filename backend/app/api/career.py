@@ -69,7 +69,13 @@ async def parse_resume_file(
         else:
             from docx import Document
             document = Document(BytesIO(payload))
-            text_content = "\n".join(paragraph.text for paragraph in document.paragraphs)
+            paragraphs = [paragraph.text for paragraph in document.paragraphs]
+            table_rows = [
+                " | ".join(cell.text.strip() for cell in row.cells)
+                for table in document.tables
+                for row in table.rows
+            ]
+            text_content = "\n".join(part for part in [*paragraphs, *table_rows] if part.strip())
     except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
