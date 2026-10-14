@@ -1,7 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from app.core.config import settings
+from app.core.security import get_current_user
+from app.models.user import User
 
 router = APIRouter(prefix="/api/v1/ai", tags=["AI assistant"])
 
@@ -17,7 +19,7 @@ class ChatRequest(BaseModel):
 
 
 @router.post("/chat", summary="Chat with the OmniNexus AI assistant")
-def chat(request: ChatRequest):
+def chat(request: ChatRequest, current_user: User = Depends(get_current_user)):
     if not settings.OPENAI_API_KEY:
         raise HTTPException(
             status_code=503,
