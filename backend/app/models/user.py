@@ -30,7 +30,7 @@ class User(Base):
         unique=True,
         index=True,
         nullable=False,
-        default=lambda: f"usr_{uuid.uuid4().hex[:8]}",
+        default=lambda: f"usr_{uuid.uuid4().hex}",
     )
 
     # ========================================================
