@@ -3,7 +3,7 @@
 import { FormEvent, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Bot, LoaderCircle, MessageCircle, Send, Sparkles } from "lucide-react";
-import { apiUrl } from "@/lib/api";
+import { apiUrl, authHeaders } from "@/lib/api";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -33,7 +33,7 @@ export default function AIAssistantPage() {
     try {
       const response = await fetch(apiUrl("/api/v1/ai/chat"), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify({ message, history: previous.slice(-20) }),
       });
       const data = await response.json();
