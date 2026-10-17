@@ -337,7 +337,7 @@ export default function FloatingNav() {
 
             text-emerald-400
           "
-          title="OmniNexus system status"
+          title="Navigation is ready; backend and AI availability are checked when you send a request."
         >
           <span
             className="
@@ -355,7 +355,7 @@ export default function FloatingNav() {
             "
           />
 
-          <span>API ONLINE</span>
+          <span>NAV READY</span>
         </div>
 
         {/* =========================================================
